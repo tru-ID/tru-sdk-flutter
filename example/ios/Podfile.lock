@@ -1,0 +1,22 @@
+PODS:
+  - Flutter (1.0.0)
+  - trusdkflutter (0.0.1):
+    - Flutter
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - trusdkflutter (from `.symlinks/plugins/trusdkflutter/ios`)
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  trusdkflutter:
+    :path: ".symlinks/plugins/trusdkflutter/ios"
+
+SPEC CHECKSUMS:
+  Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
+  trusdkflutter: 7b98f03ecd44492a6ac7ca0230ce6acb75939ec6
+
+PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c
+
+COCOAPODS: 1.10.1
