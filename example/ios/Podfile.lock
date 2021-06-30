@@ -1,11 +1,17 @@
 PODS:
   - Flutter (1.0.0)
+  - tru-sdk-ios (0.2.4)
   - trusdkflutter (0.0.1):
     - Flutter
+    - tru-sdk-ios (= 0.2.4)
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
   - trusdkflutter (from `.symlinks/plugins/trusdkflutter/ios`)
+
+SPEC REPOS:
+  trunk:
+    - tru-sdk-ios
 
 EXTERNAL SOURCES:
   Flutter:
@@ -15,8 +21,9 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
-  trusdkflutter: 7b98f03ecd44492a6ac7ca0230ce6acb75939ec6
+  tru-sdk-ios: e6ed377ab975e707548219bfd96439b09cbc9708
+  trusdkflutter: aa29d5fb0e2554d173ec7cabd07524697c19939a
 
-PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c
+PODFILE CHECKSUM: cc1f88378b4bfcf93a6ce00d2c587857c6008d3b
 
 COCOAPODS: 1.10.1

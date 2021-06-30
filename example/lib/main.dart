@@ -30,6 +30,13 @@ class _MyAppState extends State<MyApp> {
     try {
       platformVersion =
           await Trusdkflutter.platformVersion ?? 'Unknown platform version';
+
+      //Testing purposes
+      Trusdkflutter sdk = Trusdkflutter();
+      await sdk.check("hello");
+      await sdk.checkWithTrace("hello");
+      await sdk.isReachable();
+
     } on PlatformException {
       platformVersion = 'Failed to get platform version.';
     }
@@ -49,7 +56,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Plugin example app'),
+          title: const Text('tru.ID Sample App'),
         ),
         body: Center(
           child: Text('Running on: $_platformVersion\n'),
