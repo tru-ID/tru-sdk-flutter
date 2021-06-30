@@ -1,7 +1,7 @@
 name: trusdkflutter
-description: A new flutter plugin project.
+description: tru.ID flutter plugin.
 version: 0.0.1
-homepage:
+homepage: https://github.com/tru-ID/tru-sdk-flutter
 
 environment:
   sdk: ">=2.12.0 <3.0.0"
