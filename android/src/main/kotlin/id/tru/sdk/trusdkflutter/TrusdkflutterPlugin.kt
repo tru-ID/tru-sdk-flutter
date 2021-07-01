@@ -23,6 +23,7 @@
 package id.tru.sdk.trusdkflutter
 
 import android.content.Context
+import android.util.Log
 import androidx.annotation.NonNull
 import id.tru.sdk.TruSDK
 
@@ -54,6 +55,7 @@ class TrusdkflutterPlugin: FlutterPlugin, MethodCallHandler {
   }
 
   override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
+    Log.d("FlutterPlugin", "native method called")
     try {
       if (call.method == "getPlatformVersion") {
         result.success("Android ${android.os.Build.VERSION.RELEASE}")

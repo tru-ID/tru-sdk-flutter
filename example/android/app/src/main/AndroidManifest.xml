@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="id.tru.sdk.trusdkflutter_example">
    <application
-        android:label="trusdkflutter_example"
+        android:label="tru.ID Flutter"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
