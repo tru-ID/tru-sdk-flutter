@@ -41,7 +41,6 @@ public class SwiftTrusdkflutterPlugin: NSObject, FlutterPlugin {
         default:
             result(FlutterMethodNotImplemented)
         }
-        result("Method was executed successfully")
     }
     
     func check(arguments: Any?, result: @escaping FlutterResult) {
@@ -75,15 +74,15 @@ public class SwiftTrusdkflutterPlugin: NSObject, FlutterPlugin {
         sdk.checkWithTrace(url: URL(string: args)!) { error, traceInfo in
             if let error = error {
                 result("iOS checkWithTrace() - Error [\(error)]")
-            } else {
-                result("iOS checkWithTrace() - Success [\(args)]")
+                return
             }
+            result("iOS checkWithTrace() - Success [\(args)]")
         }
     }
 
     // TODO: Return serialised ReachabilityDetails
     func isReachable(result: @escaping FlutterResult) {
-        print("isRecahale called")
+        print("isReachable called")
         let sdk = TruSDK()
         sdk.isReachable { reachableResult in
             switch reachableResult {
