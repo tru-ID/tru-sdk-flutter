@@ -30,15 +30,11 @@ import 'package:trusdkflutter/trusdkflutter.dart';
 import 'src/http/mock_client.dart';
 
 // Set up a local tunnel base url.
-final String baseURL = "https://bad-yak-35.loca.lt";
+final String baseURL = "https://fluffy-cheetah-97.loca.lt";
 
 void main() {
-  runApp(FormApp());
+  runApp(PhoneCheckApp());
 }
-
-// void main() {
-//   runApp(MyApp());
-// }
 
 class MyApp extends StatefulWidget {
   @override
@@ -98,7 +94,7 @@ class _MyAppState extends State<MyApp> {
   }
 }
 
-class FormApp extends StatelessWidget {
+class PhoneCheckApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
