@@ -36,64 +36,6 @@ void main() {
   runApp(PhoneCheckApp());
 }
 
-class MyApp extends StatefulWidget {
-  @override
-  _MyAppState createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  String _platformVersion = 'Unknown';
-
-  @override
-  void initState() {
-    super.initState();
-    initPlatformState();
-  }
-
-  // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initPlatformState() async {
-    String platformVersion;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    // We also handle the message potentially returning null.
-    try {
-      platformVersion =
-          await Trusdkflutter.platformVersion ?? 'Unknown platform version';
-
-      //Testing purposes
-      Trusdkflutter sdk = Trusdkflutter();
-      await sdk.check("hello");
-      await sdk.checkWithTrace("hello");
-      await sdk.isReachable();
-
-    } on PlatformException {
-      platformVersion = 'Failed to get platform version.';
-    }
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
-
-    setState(() {
-      _platformVersion = platformVersion;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('tru.ID Sample App'),
-        ),
-        body: Center(
-          child: Text('Running on: $_platformVersion\n'),
-        ),
-      ),
-    );
-  }
-}
-
 class PhoneCheckApp extends StatelessWidget {
 
   @override
@@ -179,7 +121,7 @@ class _PhoneCheckAppState extends State<PhoneCheckHome> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.hasData) {
-            _result = 'Match status: $snapshot.data!.match';
+            _result = 'Match status: ${snapshot.data!.match}';
           } else if (snapshot.hasError) {
             _result = '$snapshot.error';
           }
@@ -317,12 +259,12 @@ class _PhoneCheckAppState extends State<PhoneCheckHome> {
       // Platform messages may fail, so we use a try/catch PlatformException.
       // We also handle the message potentially returning null.
       try {
-        String platformVersion =
-            await Trusdkflutter.platformVersion ?? 'Unknown platform version';
+        // String platformVersion = await Trusdkflutter.platformVersion ?? 'Unknown platform version';
 
         Trusdkflutter sdk = Trusdkflutter();
         //await performPhoneCheck(checkDetails.url);//This over Flutter http, testing purposes.
         await sdk.check(checkDetails.url);
+        //Alternatively, we can use checkWithTrace
         //await sdk.checkWithTrace(checkDetails.url);
         //await sdk.isReachable();
 
@@ -378,8 +320,7 @@ Future<CheckStatus> fetchPhoneCheckResult(String checkID) async {
 
   print("[CheckStatus] - Received response");
   if (response.statusCode == 200) {
-    // If the server did return a 201 CREATED response,
-    // then parse the JSON.
+    print('Response: ${response.body}');
     return CheckStatus.fromJson(jsonDecode(response.body));
   } else {
     throw Exception('Failed to fetching phone check status');
@@ -402,14 +343,14 @@ class PhoneCheck {
 
 class CheckStatus {
   final String id;
-  final bool match;
+  bool match = false;
 
   CheckStatus({required this.id, required this.match});
 
   factory CheckStatus.fromJson(Map<String, dynamic> json) {
     return CheckStatus(
       id: json['check_id'],
-      match: json['match'],
+      match: json['match'] == null ? false : json['match'],
     );
   }
 }
