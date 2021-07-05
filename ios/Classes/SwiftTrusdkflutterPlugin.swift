@@ -33,7 +33,6 @@ public class SwiftTrusdkflutterPlugin: NSObject, FlutterPlugin {
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         //This method is called on the Main Thread
-      print("gandle called")
         switch call.method {
         case "getPlatformVersion" : result("iOS " + UIDevice.current.systemVersion)
         case "check" : check(arguments: call.arguments, result: result)
@@ -52,7 +51,7 @@ public class SwiftTrusdkflutterPlugin: NSObject, FlutterPlugin {
                                 details: nil))
             return
         }
-        print("check called")
+
         let sdk = TruSDK()
         sdk.check(url: URL(string: args)!) { error in
             if let error = error {
@@ -61,23 +60,28 @@ public class SwiftTrusdkflutterPlugin: NSObject, FlutterPlugin {
                 result("iOS check() - Success [\(args)]")
             }
         }
-       
-        
     }
-    
+
+    //TODO: Return serialised TraceInfo
     func checkWithTrace(arguments: Any?, result: @escaping FlutterResult) {
-        print("checkwithTrace called")
         guard let args = arguments as? String else {
             result(FlutterError(code: "iOSError",
                                 message: "No url parameter",
                                 details: nil))
             return
         }
-        // trusdk.checkwithTrace(url: url) {
-        // result(..)
-        //}
+
+        let sdk = TruSDK()        
+        sdk.checkWithTrace(url: URL(string: args)!) { error, traceInfo in
+            if let error = error {
+                result("iOS checkWithTrace() - Error [\(error)]")
+            } else {
+                result("iOS checkWithTrace() - Success [\(args)]")
+            }
+        }
     }
-    
+
+    // TODO: Return serialised ReachabilityDetails
     func isReachable(result: @escaping FlutterResult) {
         print("isRecahale called")
         let sdk = TruSDK()
@@ -86,7 +90,6 @@ public class SwiftTrusdkflutterPlugin: NSObject, FlutterPlugin {
             case .success(let details): result("iOS isReachable() - Success")
             case .failure(let error): result("iOS isReachable() - \(error)")
             }
-            
         }
     }
 }
