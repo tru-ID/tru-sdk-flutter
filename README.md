@@ -17,22 +17,57 @@ For help getting started with Flutter, view our
 samples, guidance on mobile development, and a full API reference.
 
 ## Installation
+To add the package tru_sdk_flutter to your app:
+
+1. Depend on it 
+   * Open the `pub spec.yaml` file located inside the app folder and add 
+	`tru_sdk_flutter: ^0.0.1` 
+     under the dependencies.
+
+2. Install it 
+   * From the terminal: Run ‘flutter pub get’ **OR**
+   * From Android Studio/IntelliJ: Click **Packages get** in the action ribbon at the top of pubspec.yaml.
+   * From VS Code: Click **Get Packages** located in right side of the action ribbon at the top of pubspec.yaml.
+
+3. Import it
+- Add a corresponding import statement in the Dart code
+  `import 'package:trusdkflutter/trusdkflutter.dart';`
+4. Stop and restart the app, if necessary
 
 
-## Usage example
-
+## Usage
 
 ```dart
+import 'package:trusdkflutter/trusdkflutter.dart';
+// ...
+Future<String?> check(String url) async {
+    String? sdkCheck;
+    try {
+      sdkCheck = await _channel.invokeMethod('check', url);
+    } on PlatformException catch (e) {
+      sdkCheck = "Failed to get result: '${e.message}'.";
+    }
+    print("check called");
+    return sdkCheck;
+  }
 
-}
+
 ```
+## Example
+The SDK contains an embedded example to make building and testing the SDK bridge easier.
+Before you begin, you will need to:
+- Install [Flutter](https://flutter.dev/docs/get-started/install)
+- Set up an [editor](https://flutter.dev/docs/get-started/editor)
+- Install the [Flutter and Dart plugins for Android](https://flutter.dev/docs/get-started/editor?tab=androidstudio)
+- For iOS: Xcode 12+ required
+- For Android: Android Studio version 3.0 or later
+- For tru.ID PhoneCheck set up a [local tunnel base](https://developer.tru.id/docs/phone-check/quick-start) and change the baseURL on the lib/main.dart file of the Example Project accordingly.
+
 
 ## Release History
 * 0.0.1
-    * Work in progress    
+    * Initial implementation  
   
-
-
 
 ## Meta
 
