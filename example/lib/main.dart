@@ -30,7 +30,7 @@ import 'package:trusdkflutter/trusdkflutter.dart';
 import 'src/http/mock_client.dart';
 
 // Set up a local tunnel base url.
-final String baseURL = "https://fluffy-cheetah-97.loca.lt";
+final String baseURL = "https://clever-mole-63.loca.lt";
 
 void main() {
   runApp(PhoneCheckApp());
@@ -263,7 +263,8 @@ class _PhoneCheckAppState extends State<PhoneCheckHome> {
 
         Trusdkflutter sdk = Trusdkflutter();
         //await performPhoneCheck(checkDetails.url);//This over Flutter http, testing purposes.
-        await sdk.check(checkDetails.url);
+        String? result = await sdk.check(checkDetails.url);
+        print("Check Results -> ${result}");
         //Alternatively, we can use checkWithTrace
         //await sdk.checkWithTrace(checkDetails.url);
         //await sdk.isReachable();

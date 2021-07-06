@@ -32,10 +32,12 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
+import kotlinx.coroutines.CoroutineScope
 import java.lang.Exception
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.launch
+import java.net.URL
 
 /** TrusdkflutterPlugin */
 class TrusdkflutterPlugin: FlutterPlugin, MethodCallHandler {
@@ -57,16 +59,22 @@ class TrusdkflutterPlugin: FlutterPlugin, MethodCallHandler {
   override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
     Log.d("FlutterPlugin", "native method called")
     try {
-      if (call.method == "getPlatformVersion") {
-        result.success("Android ${android.os.Build.VERSION.RELEASE}")
-      } else if (call.method == "check") {
-        check(call.arguments as String, result)
-      } else if (call.method == "checkWithTrace") {
-        checkWithTrace(call.arguments as String, result)
-      } else if (call.method == "isReachable") {
-        isReachable(result)
-      }else {
-        result.notImplemented()
+      when (call.method) {
+          "getPlatformVersion" -> {
+            result.success("Android ${android.os.Build.VERSION.RELEASE}")
+          }
+          "check" -> {
+            check(call.arguments as String, result)
+          }
+          "checkWithTrace" -> {
+            checkWithTrace(call.arguments as String, result)
+          }
+          "isReachable" -> {
+            isReachable(result)
+          }
+          else -> {
+            result.notImplemented()
+          }
       }
     } catch (e: Exception) {
       result.error("Exception", "Received an exception ${e.localizedMessage}", e)
@@ -78,17 +86,41 @@ class TrusdkflutterPlugin: FlutterPlugin, MethodCallHandler {
   }
 
   fun check(url: String, result: Result) {
-//    val isRequestOnMobileNetwork = sdk.openCheckUrl(url)
+    CoroutineScope(Dispatchers.IO).launch {
+      try {
+        val isRequestOnMobileNetwork = sdk.openCheckUrl(url)
+        launch(Dispatchers.Main) {
+          print("Calling results on main thread")
+          result.success("$isRequestOnMobileNetwork")
+        }
+      } catch (e: Exception) {
+        launch(Dispatchers.Main) {
+          result.error("Exception", "Received an exception ${e.localizedMessage}", e)
+        }
+      }
+    }
   }
 
   fun checkWithTrace(url: String, result: Result) {
-//    val traceInfo = sdk.checkWithTrace(url)
+    CoroutineScope(Dispatchers.IO).launch {
+      try {
+        val traceInfo = sdk.checkWithTrace(URL(url))
+        result.success("${traceInfo.trace}")
+      } catch (e: Exception) {
+        result.error("Exception", "Received an exception ${e.localizedMessage}", e)
+      }
+    }
   }
 
   fun isReachable(result: Result) {
-    val details = sdk.isReachable()
-//    launch {
-//
-//    }
+
+    CoroutineScope(Dispatchers.IO).launch {
+      try {
+        val details = sdk.isReachable()
+        result.success("${details?.networkName}")
+      } catch (e: Exception) {
+        result.error("Exception", "Received an exception ${e.localizedMessage}", e)
+      }
+    }
   }
 }
