@@ -20,7 +20,7 @@ samples, guidance on mobile development, and a full API reference.
 To add the package tru_sdk_flutter to your app:
 
 1. Depend on it 
-   * Open the `pub spec.yaml` file located inside the app folder and add 
+   * Open the `pubspec.yaml` file located inside the app folder and add 
 	`tru_sdk_flutter: ^0.0.1` 
      under the dependencies.
 
@@ -30,7 +30,7 @@ To add the package tru_sdk_flutter to your app:
    * From VS Code: Click **Get Packages** located in right side of the action ribbon at the top of pubspec.yaml.
 
 3. Import it
-- Add a corresponding import statement in the Dart code
+   * Add a corresponding import statement in the Dart code
   `import 'package:trusdkflutter/trusdkflutter.dart';`
 4. Stop and restart the app, if necessary
 
@@ -40,17 +40,8 @@ To add the package tru_sdk_flutter to your app:
 ```dart
 import 'package:trusdkflutter/trusdkflutter.dart';
 // ...
-Future<String?> check(String url) async {
-    String? sdkCheck;
-    try {
-      sdkCheck = await _channel.invokeMethod('check', url);
-    } on PlatformException catch (e) {
-      sdkCheck = "Failed to get result: '${e.message}'.";
-    }
-    print("check called");
-    return sdkCheck;
-  }
-
+Trusdkflutter sdk = Trusdkflutter();
+        String? result = await sdk.check(checkDetails.url);
 
 ```
 ## Example
