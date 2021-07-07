@@ -32,6 +32,7 @@ To add the package tru_sdk_flutter to your app:
 3. Import it
    * Add a corresponding import statement in the Dart code
   `import 'package:trusdkflutter/trusdkflutter.dart';`
+  
 4. Stop and restart the app, if necessary
 
 
@@ -41,8 +42,7 @@ To add the package tru_sdk_flutter to your app:
 import 'package:trusdkflutter/trusdkflutter.dart';
 // ...
 Trusdkflutter sdk = Trusdkflutter();
-        String? result = await sdk.check(checkDetails.url);
-
+String? result = await sdk.check(checkDetails.url);
 ```
 ## Example
 The SDK contains an embedded example to make building and testing the SDK bridge easier.
