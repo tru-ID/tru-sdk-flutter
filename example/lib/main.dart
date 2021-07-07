@@ -289,29 +289,6 @@ class _PhoneCheckAppState extends State<PhoneCheckHome> {
 
 }
 
-Future<PhoneCheck> performPhoneCheck(String url) async {
-  print("[PerformPhoneCheck] - Performing phone check");
-
-  //----------
-  //Should be performed by the SDK
-  final response = await http.get(
-    Uri.parse(url),
-  );
-  //----------
-
-  print('[PerformPhoneCheck] - Received ${response.statusCode}');
-  if (response.statusCode == 200) {
-    return PhoneCheck.fromJson(jsonDecode(response.body));
-  } else if (response.statusCode == 400) { //Mobile Network Operator Not Supported
-    throw Exception('Mobile Network Operator Not Supported');
-  } else if (response.statusCode == 402) { //Insufficient Funds
-    throw Exception('Insufficient Funds');
-  } else if (response.statusCode == 412) { //Not on a Mobile Network IP
-    throw Exception('Not on a Mobile Network IP');
-  } else {
-    throw Exception('Failed to performing phone check');
-  }
-}
 
 Future<CheckStatus> fetchPhoneCheckResult(String checkID) async {
   print("[CheckStatus] - Fetching phone check status");
