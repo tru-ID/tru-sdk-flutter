@@ -244,7 +244,7 @@ class _PhoneCheckAppState extends State<PhoneCheckHome> {
   Future<CheckStatus> executeFlow(String phoneNumber) async {
     print("[PhoneCheck] - Creating phone check");
     final response = await http.post(
-      Uri.parse('$baseURL/check'),
+      Uri.parse('$baseURL/phone-check'),
       headers: <String, String>{
         'content-type': 'application/json; charset=UTF-8',
       },
@@ -293,7 +293,7 @@ class _PhoneCheckAppState extends State<PhoneCheckHome> {
 Future<CheckStatus> fetchPhoneCheckResult(String checkID) async {
   print("[CheckStatus] - Fetching phone check status");
   final response = await http.get(
-    Uri.parse('$baseURL/check_status?check_id=${checkID}'),
+    Uri.parse('$baseURL/phone-check?check_id=${checkID}'),
   );
 
   print("[CheckStatus] - Received response");
