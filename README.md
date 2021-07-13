@@ -76,10 +76,10 @@ In `example/lib/main.dart` , replace `base_url` with your development server URL
 
 It may be a good idea to work on the native Android or iOS example projects in separate windows/IDEs. Android Studio will provide a banner suggesting this.
 
-Android Example Project
+Android Example Project\
 tru-sdk-flutter/example/android
 
-iOS Example
+iOS Example\
 tru-sdk-flutter/example/ios
 
 Don't forget to make sure Cocoapods installed on your machine.
