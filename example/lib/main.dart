@@ -42,12 +42,9 @@ class PhoneCheckApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Tru.Id Phone Check Sample',
-      theme: ThemeData(
-          primarySwatch: Colors.teal
-        //primarySwatch: Colors.blue,
-      ),
-      home: PhoneCheckHome(title: 'Tru.ID Flutter Sample App'),
+      title: 'tru.ID Phone Check Sample',
+      theme: ThemeData(),
+      home: PhoneCheckHome(title: 'tru.ID Flutter Sample App'),
     );
   }
 
@@ -74,11 +71,12 @@ class _PhoneCheckAppState extends State<PhoneCheckHome> {
     return MaterialApp(
       title: 'tru.ID Sample App',
       theme: ThemeData(
+        scaffoldBackgroundColor: Colors.white,
         primarySwatch: Colors.blue,
       ),
       home: Scaffold(
         appBar: AppBar(
-          title: Text('tru.ID Sample App'),
+          title: Text('tru.ID Flutter Sample App'),
         ),
         body: bodyContainer(),
       ),
