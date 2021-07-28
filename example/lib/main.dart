@@ -31,7 +31,7 @@ import 'package:tru_sdk_flutter/tru_sdk_flutter.dart';
 import 'src/http/mock_client.dart';
 
 // Set up a local tunnel base url.
-final String baseURL = "https://new-tiger-37.loca.lt";
+final String baseURL = "https://moody-termite-65.loca.lt";
 
 void main() {
   runApp(PhoneCheckApp());
@@ -42,12 +42,9 @@ class PhoneCheckApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Tru.Id Phone Check Sample',
-      theme: ThemeData(
-          primarySwatch: Colors.teal
-        //primarySwatch: Colors.blue,
-      ),
-      home: PhoneCheckHome(title: 'Tru.ID Flutter Sample App'),
+      title: 'tru.ID Phone Check Sample',
+      theme: ThemeData(),
+      home: PhoneCheckHome(title: 'tru.ID Flutter Sample App'),
     );
   }
 
@@ -74,11 +71,12 @@ class _PhoneCheckAppState extends State<PhoneCheckHome> {
     return MaterialApp(
       title: 'tru.ID Sample App',
       theme: ThemeData(
+        scaffoldBackgroundColor: Colors.white,
         primarySwatch: Colors.blue,
       ),
       home: Scaffold(
         appBar: AppBar(
-          title: Text('tru.ID Sample App'),
+          title: Text('tru.ID Flutter Sample App'),
         ),
         body: bodyContainer(),
       ),
