@@ -33,9 +33,10 @@ For Android, this SDK requires a minimum API level of **21** (Android 5).
 ## Usage
 
 ```dart
-import 'package:trusdkflutter/trusdkflutter.dart';
+import 'package:tru_sdk_flutter/tru_sdk_flutter.dart';
+
 // ...
-Trusdkflutter sdk = Trusdkflutter();
+TruSdkFlutter sdk = TruSdkFlutter();
 
 await sdk.check(checkUrl);
 ```
