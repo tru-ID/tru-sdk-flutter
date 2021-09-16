@@ -31,7 +31,7 @@ import 'package:tru_sdk_flutter/tru_sdk_flutter.dart';
 import 'src/http/mock_client.dart';
 
 // Set up a local tunnel base url.
-final String baseURL = "https://moody-termite-65.loca.lt";
+final String baseURL = "<YOUR_LOCAL_TUNNEL_URL>";
 
 void main() {
   runApp(PhoneCheckApp());
