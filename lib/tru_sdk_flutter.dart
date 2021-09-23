@@ -24,7 +24,8 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 
 class TruSdkFlutter {
-  static const MethodChannel _channel = const MethodChannel('id.tru.sdk/flutter');
+  static const MethodChannel _channel =
+      const MethodChannel('id.tru.sdk/flutter');
 
   static Future<String?> get platformVersion async {
     final String? version = await _channel.invokeMethod('getPlatformVersion');
@@ -43,23 +44,19 @@ class TruSdkFlutter {
   }
 
   Future<String?> checkWithTrace(String url) async {
-    String? sdkCheckWithTrace;
     try {
-      sdkCheckWithTrace = await _channel.invokeMethod('checkWithTrace', url);
+      return await _channel.invokeMethod('checkWithTrace', url);
     } on PlatformException catch (e) {
-      null;
+      return e.message;
     }
-    print("checkwithTrace called");
   }
 
   Future<String?> isReachable() async {
-    String? sdkIsReachable;
     try {
-      sdkIsReachable = await _channel.invokeMethod('isReachable');
+      return await _channel.invokeMethod('isReachable');
     } on PlatformException catch (e) {
-      null;
+      return e.message;
     }
-    print("reachability called");
   }
 }
 
@@ -78,7 +75,7 @@ class Product {
 
 enum ProductType {
   PhoneCheck,
-  SIMCheck ,
+  SIMCheck,
   SubscriberCheck,
 }
 
@@ -95,7 +92,7 @@ class TraceInfo {
 }
 
 class DebugInfo {
-  Map<String,String> bufferMap = {};
+  Map<String, String> bufferMap = {};
 }
 
 class TraceCollector {
@@ -106,4 +103,3 @@ class TraceCollector {
   bool isConsoleLogsEnabled = false;
   TraceInfo traceInfo = TraceInfo();
 }
-
