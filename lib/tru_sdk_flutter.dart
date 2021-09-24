@@ -33,14 +33,11 @@ class TruSdkFlutter {
   }
 
   Future<String?> check(String url) async {
-    String? sdkCheck;
     try {
-      sdkCheck = await _channel.invokeMethod('check', url);
+      return await _channel.invokeMethod('check', url);
     } on PlatformException catch (e) {
-      sdkCheck = "Failed to get result: '${e.message}'.";
+      return e.message;
     }
-    print("check called");
-    return sdkCheck;
   }
 
   Future<String?> checkWithTrace(String url) async {
