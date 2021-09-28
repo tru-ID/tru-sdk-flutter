@@ -67,13 +67,7 @@ class ReachabilityDetails {
 
 class Product {
   String productId = "";
-  ProductType productType = ProductType.PhoneCheck;
-}
-
-enum ProductType {
-  PhoneCheck,
-  SIMCheck,
-  SubscriberCheck,
+  String productName = "";
 }
 
 class ReachabilityError {
