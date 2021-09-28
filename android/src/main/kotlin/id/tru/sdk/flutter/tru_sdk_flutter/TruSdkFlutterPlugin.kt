@@ -105,21 +105,28 @@ class TruSdkFlutterPlugin: FlutterPlugin, MethodCallHandler {
     CoroutineScope(Dispatchers.IO).launch {
       try {
         val traceInfo = sdk.checkWithTrace(URL(url))
-        result.success("${traceInfo.trace}")
+        launch(Dispatchers.Main) {
+          result.success("${traceInfo.trace}")
+        }
       } catch (e: Exception) {
-        result.error("Exception", "Received an exception ${e.localizedMessage}", e)
+        launch(Dispatchers.Main) {
+          result.error("Exception", "Received an exception ${e.localizedMessage}", e)
+        }
       }
     }
   }
 
   fun isReachable(result: Result) {
-
     CoroutineScope(Dispatchers.IO).launch {
       try {
         val details = sdk.isReachable()
-        result.success("${details?.networkName}")
+        launch(Dispatchers.Main) {
+          result.success("${details?.networkName}")
+        }
       } catch (e: Exception) {
-        result.error("Exception", "Received an exception ${e.localizedMessage}", e)
+        launch(Dispatchers.Main) {
+          result.error("Exception", "Received an exception ${e.localizedMessage}", e)
+        }
       }
     }
   }
