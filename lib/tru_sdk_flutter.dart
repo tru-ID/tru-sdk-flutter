@@ -24,7 +24,8 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 
 class TruSdkFlutter {
-  static const MethodChannel _channel = const MethodChannel('id.tru.sdk/flutter');
+  static const MethodChannel _channel =
+      const MethodChannel('id.tru.sdk/flutter');
 
   static Future<String?> get platformVersion async {
     final String? version = await _channel.invokeMethod('getPlatformVersion');
@@ -32,34 +33,27 @@ class TruSdkFlutter {
   }
 
   Future<String?> check(String url) async {
-    String? sdkCheck;
     try {
-      sdkCheck = await _channel.invokeMethod('check', url);
+      return await _channel.invokeMethod('check', url);
     } on PlatformException catch (e) {
-      sdkCheck = "Failed to get result: '${e.message}'.";
+      return e.message;
     }
-    print("check called");
-    return sdkCheck;
   }
 
   Future<String?> checkWithTrace(String url) async {
-    String? sdkCheckWithTrace;
     try {
-      sdkCheckWithTrace = await _channel.invokeMethod('checkWithTrace', url);
+      return await _channel.invokeMethod('checkWithTrace', url);
     } on PlatformException catch (e) {
-      null;
+      return e.message;
     }
-    print("checkwithTrace called");
   }
 
   Future<String?> isReachable() async {
-    String? sdkIsReachable;
     try {
-      sdkIsReachable = await _channel.invokeMethod('isReachable');
+      return await _channel.invokeMethod('isReachable');
     } on PlatformException catch (e) {
-      null;
+      return e.message;
     }
-    print("reachability called");
   }
 }
 
@@ -73,13 +67,7 @@ class ReachabilityDetails {
 
 class Product {
   String productId = "";
-  ProductType productType = ProductType.PhoneCheck;
-}
-
-enum ProductType {
-  PhoneCheck,
-  SIMCheck ,
-  SubscriberCheck,
+  String productName = "";
 }
 
 class ReachabilityError {
@@ -95,7 +83,7 @@ class TraceInfo {
 }
 
 class DebugInfo {
-  Map<String,String> bufferMap = {};
+  Map<String, String> bufferMap = {};
 }
 
 class TraceCollector {
@@ -106,4 +94,3 @@ class TraceCollector {
   bool isConsoleLogsEnabled = false;
   TraceInfo traceInfo = TraceInfo();
 }
-
