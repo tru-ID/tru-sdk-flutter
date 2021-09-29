@@ -62,7 +62,7 @@ class ReachabilityDetails {
   String networkId = "";
   String networkName = "";
   List<Product>? products = [];
-  ReachabilityError? error = null;
+  ReachabilityError? error;
   String link = "";
 }
 

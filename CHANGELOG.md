@@ -5,6 +5,7 @@
 ## Version 0.0.4
 
 **Changes**
+
 Add `error` class member to handle `isReachable` error.
 
 ## Version 0.0.3
