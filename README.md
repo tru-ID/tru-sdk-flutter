@@ -15,7 +15,7 @@ To add the package `tru_sdk_flutter` to your app project:
 1. Depend on it. Open the `pubspec.yaml` file located inside the app folder and add the following under the dependencies heading:
 
 ```yaml
-	`tru_sdk_flutter: ^0.0.3`
+	`tru_sdk_flutter: ^0.0.4`
 ```
 
 2. Install it
@@ -86,6 +86,9 @@ tru-sdk-flutter/example/ios
 Don't forget to make sure Cocoapods installed on your machine.
 
 ## Release History
+- 0.0.4
+  - Add `error` class member to handle `isReachable` error.
+
 - 0.0.3
   - iOS and Android version increase + Bug fix to isReachable & checkWithTrace methods
 
