@@ -25,6 +25,7 @@ package id.tru.sdk.flutter.tru_sdk_flutter
 import android.content.Context
 import android.util.Log
 import androidx.annotation.NonNull
+import id.tru.sdk.ReachabilityDetails
 import id.tru.sdk.TruSDK
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
@@ -37,6 +38,7 @@ import java.lang.Exception
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.launch
+import java.io.Serializable
 import java.net.URL
 
 /** TruSdkFlutterPlugin */
@@ -88,7 +90,7 @@ class TruSdkFlutterPlugin: FlutterPlugin, MethodCallHandler {
   fun check(url: String, result: Result) {
     CoroutineScope(Dispatchers.IO).launch {
       try {
-        val isRequestOnMobileNetwork = sdk.openCheckUrl(url)
+        val isRequestOnMobileNetwork = sdk.check(url)
         launch(Dispatchers.Main) {
           print("Calling results on main thread")
           result.success("$isRequestOnMobileNetwork")
@@ -119,9 +121,12 @@ class TruSdkFlutterPlugin: FlutterPlugin, MethodCallHandler {
   fun isReachable(result: Result) {
     CoroutineScope(Dispatchers.IO).launch {
       try {
-        val details = sdk.isReachable()
+        val reachabilityInfo: ReachabilityDetails? = sdk.isReachable()
+
+        val details = reachabilityInfo?.toJsonString()
+
         launch(Dispatchers.Main) {
-          result.success("${details?.networkName}")
+          result.success(details)
         }
       } catch (e: Exception) {
         launch(Dispatchers.Main) {
