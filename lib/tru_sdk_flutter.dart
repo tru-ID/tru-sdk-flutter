@@ -22,6 +22,7 @@
  */
 import 'dart:async';
 import 'package:flutter/services.dart';
+import 'dart:convert';
 
 class TruSdkFlutter {
   static const MethodChannel _channel =
@@ -64,6 +65,25 @@ class ReachabilityDetails {
   List<Product>? products = [];
   ReachabilityError? error = null;
   String link = "";
+
+  ReachabilityDetails(
+      {required this.countryCode,
+      required this.networkId,
+      required this.networkName,
+      required this.error,
+      required this.products,
+      required this.link});
+
+  ReachabilityDetails reachableResult(String jsonString) =>
+      ReachabilityDetails.fromJson(json.decode(jsonString));
+  factory ReachabilityDetails.fromJson(Map<String, dynamic> json) =>
+      ReachabilityDetails(
+          countryCode: json["countryCode"],
+          networkId: json["networkId"],
+          networkName: json["networkName"],
+          error: json["error"],
+          products: json["products"],
+          link: json["link"]);
 }
 
 class Product {
