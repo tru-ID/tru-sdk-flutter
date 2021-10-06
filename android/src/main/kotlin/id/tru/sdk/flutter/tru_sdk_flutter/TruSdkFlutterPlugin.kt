@@ -121,12 +121,11 @@ class TruSdkFlutterPlugin: FlutterPlugin, MethodCallHandler {
   fun isReachable(result: Result) {
     CoroutineScope(Dispatchers.IO).launch {
       try {
-        val reachabilityInfo: ReachabilityDetails? = sdk.isReachable()
+        val reachabilityDetails: ReachabilityDetails? = sdk.isReachable()
 
-        val details = reachabilityInfo?.toJsonString()
-
+      
         launch(Dispatchers.Main) {
-          result.success(details)
+          result.success(reachabilityDetails)
         }
       } catch (e: Exception) {
         launch(Dispatchers.Main) {
