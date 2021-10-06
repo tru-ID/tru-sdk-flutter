@@ -76,14 +76,16 @@ class ReachabilityDetails {
 
   ReachabilityDetails reachableResult(String jsonString) =>
       ReachabilityDetails.fromJson(json.decode(jsonString));
-  factory ReachabilityDetails.fromJson(Map<String, dynamic> json) =>
-      ReachabilityDetails(
-          countryCode: json["countryCode"],
-          networkId: json["networkId"],
-          networkName: json["networkName"],
-          error: json["error"],
-          products: json["products"],
-          link: json["link"]);
+
+      
+  ReachabilityDetails.fromJson(Map<String, dynamic> json) {
+    countryCode = json["countryCode"];
+    networkId = json["networkId"];
+    networkName = json["networkName"];
+    error = json["error"];
+    products = json["products"];
+    link = json["link"];
+  }
 }
 
 class Product {
