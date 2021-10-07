@@ -22,7 +22,7 @@
  */
 import 'dart:async';
 import 'package:flutter/services.dart';
-import 'dart:convert';
+import 'dart:io' show Platform;
 
 class TruSdkFlutter {
   static const MethodChannel _channel =
@@ -63,41 +63,72 @@ class ReachabilityDetails {
   String networkId = "";
   String networkName = "";
   List<Product>? products = [];
-  ReachabilityError? error = null;
-  String link = "";
+  ReachabilityError? error;
 
   ReachabilityDetails(
       {required this.countryCode,
       required this.networkId,
       required this.networkName,
-      required this.error,
       required this.products,
-      required this.link});
+      required this.error});
 
-  ReachabilityDetails reachableResult(String jsonString) =>
-      ReachabilityDetails.fromJson(json.decode(jsonString));
+  factory ReachabilityDetails.fromJson(Map<String?, dynamic> jsonBody) {
+    var productsJson = jsonBody['products'];
 
-      
-  ReachabilityDetails.fromJson(Map<String, dynamic> json) {
-    countryCode = json["countryCode"];
-    networkId = json["networkId"];
-    networkName = json["networkName"];
-    error = json["error"];
-    products = json["products"];
-    link = json["link"];
+    Iterable l = jsonBody['products'];
+    List<Product> products = List<Product>.from(
+        l.map((productsJson) => Product.fromJson(productsJson)));
+
+    if (Platform.isAndroid) {
+      return ReachabilityDetails(
+          countryCode: jsonBody['countryCode'],
+          networkId: jsonBody['networkId'],
+          networkName: jsonBody['networkName'],
+          products: products,
+          error: jsonBody['error']);
+    } else {
+      return ReachabilityDetails(
+          countryCode: jsonBody['country_code'],
+          networkId: jsonBody['network_id'],
+          networkName: jsonBody['network_name'],
+          products: products,
+          error: jsonBody['error']);
+    }
   }
 }
 
 class Product {
   String productId = "";
   String productName = "";
+
+  Product({required this.productId, required this.productName});
+
+  factory Product.fromJson(Map<String?, dynamic> json) {
+    if (Platform.isAndroid) {
+      return Product(
+          productId: json['productId'], productName: json['productName']);
+    } else {
+      return Product(
+          productId: json['product_id'], productName: json['product_name']);
+    }
+  }
 }
 
 class ReachabilityError {
-  String type = "";
-  String title = "";
-  int status = 0;
-  String detail = "";
+  String? type;
+  String? title;
+  int? status;
+  String? detail;
+
+  ReachabilityError({this.type, this.title, this.status, this.detail});
+
+  factory ReachabilityError.fromJson(Map<String?, dynamic> json) {
+    return ReachabilityError(
+        type: json['type'],
+        title: json['title'],
+        status: json['status'],
+        detail: json['detail']);
+  }
 }
 
 class TraceInfo {
