@@ -22,7 +22,6 @@
  */
 import 'dart:async';
 import 'package:flutter/services.dart';
-import 'dart:io' show Platform;
 
 class TruSdkFlutter {
   static const MethodChannel _channel =
@@ -79,21 +78,12 @@ class ReachabilityDetails {
     List<Product> products = List<Product>.from(
         l.map((productsJson) => Product.fromJson(productsJson)));
 
-    if (Platform.isAndroid) {
-      return ReachabilityDetails(
-          countryCode: jsonBody['countryCode'],
-          networkId: jsonBody['networkId'],
-          networkName: jsonBody['networkName'],
-          products: products,
-          error: jsonBody['error']);
-    } else {
-      return ReachabilityDetails(
-          countryCode: jsonBody['country_code'],
-          networkId: jsonBody['network_id'],
-          networkName: jsonBody['network_name'],
-          products: products,
-          error: jsonBody['error']);
-    }
+    return ReachabilityDetails(
+        countryCode: jsonBody['country_code'],
+        networkId: jsonBody['network_id'],
+        networkName: jsonBody['network_name'],
+        products: products,
+        error: jsonBody['error']);
   }
 }
 
@@ -104,13 +94,8 @@ class Product {
   Product({required this.productId, required this.productName});
 
   factory Product.fromJson(Map<String?, dynamic> json) {
-    if (Platform.isAndroid) {
-      return Product(
-          productId: json['productId'], productName: json['productName']);
-    } else {
-      return Product(
-          productId: json['product_id'], productName: json['product_name']);
-    }
+    return Product(
+        productId: json['product_id'], productName: json['product_name']);
   }
 }
 
