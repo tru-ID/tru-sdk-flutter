@@ -2,7 +2,21 @@
 
 # Change Log
 
+## Version 0.0.5
+
+_2021-10-08_
+
+**Changes**
+
+Increased tru's Android SDK version
+
+**Bug Fixes**
+
+`isReachable` JSON response wasn't being handled correctly, causing the application to crash.
+
 ## Version 0.0.4
+
+_2021-09-29_
 
 **Changes**
 

@@ -87,7 +87,14 @@ public class SwiftTruSdkFlutterPlugin: NSObject, FlutterPlugin {
         let sdk = TruSDK()
         sdk.isReachable { reachableResult in
             switch reachableResult {
-            case .success(let details): result("iOS isReachable() - Success")
+            case .success(let details):
+                do {
+                    let jsonData = try JSONEncoder().encode(details)
+                    let jsonString = String(data: jsonData, encoding: .utf8)!
+                     result(jsonString)
+                } catch  {
+                    result("Unable to decode reachability result")
+                }
             case .failure(let error): result("iOS isReachable() - \(error)")
             }
         }

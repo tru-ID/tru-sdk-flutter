@@ -63,19 +63,57 @@ class ReachabilityDetails {
   String networkName = "";
   List<Product>? products = [];
   ReachabilityError? error;
-  String link = "";
+
+  ReachabilityDetails(
+      {required this.countryCode,
+      required this.networkId,
+      required this.networkName,
+      required this.products,
+      required this.error});
+
+  factory ReachabilityDetails.fromJson(Map<String?, dynamic> jsonBody) {
+    var productsJson = jsonBody['products'];
+
+    Iterable l = jsonBody['products'];
+    List<Product> products = List<Product>.from(
+        l.map((productsJson) => Product.fromJson(productsJson)));
+
+    return ReachabilityDetails(
+        countryCode: jsonBody['country_code'],
+        networkId: jsonBody['network_id'],
+        networkName: jsonBody['network_name'],
+        products: products,
+        error: jsonBody['error']);
+  }
 }
 
 class Product {
   String productId = "";
   String productName = "";
+
+  Product({required this.productId, required this.productName});
+
+  factory Product.fromJson(Map<String?, dynamic> json) {
+    return Product(
+        productId: json['product_id'], productName: json['product_name']);
+  }
 }
 
 class ReachabilityError {
-  String type = "";
-  String title = "";
-  int status = 0;
-  String detail = "";
+  String? type;
+  String? title;
+  int? status;
+  String? detail;
+
+  ReachabilityError({this.type, this.title, this.status, this.detail});
+
+  factory ReachabilityError.fromJson(Map<String?, dynamic> json) {
+    return ReachabilityError(
+        type: json['type'],
+        title: json['title'],
+        status: json['status'],
+        detail: json['detail']);
+  }
 }
 
 class TraceInfo {

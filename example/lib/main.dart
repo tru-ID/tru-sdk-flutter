@@ -38,7 +38,6 @@ void main() {
 }
 
 class PhoneCheckApp extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -47,7 +46,6 @@ class PhoneCheckApp extends StatelessWidget {
       home: PhoneCheckHome(title: 'tru.ID Flutter Sample App'),
     );
   }
-
 }
 
 class PhoneCheckHome extends StatefulWidget {
@@ -106,7 +104,7 @@ class _PhoneCheckAppState extends State<PhoneCheckHome> {
               validatingFormField(),
               const SizedBox(height: 24),
               verifyButton(),
-              Text((_result == null) ? "" : "Results ${_result}" )
+              Text((_result == null) ? "" : "Results ${_result}")
             ],
           ),
         ),
@@ -136,11 +134,9 @@ class _PhoneCheckAppState extends State<PhoneCheckHome> {
   }
 
   Widget logo() {
-    return  Center(
+    return Center(
       child: Image.asset('assets/images/1024.png',
-          width: 175.0,
-          height: 100.0,
-          fit: BoxFit.cover),
+          width: 175.0, height: 100.0, fit: BoxFit.cover),
     );
   }
 
@@ -229,7 +225,7 @@ class _PhoneCheckAppState extends State<PhoneCheckHome> {
         if (!valid) {
           return;
         }
-        if(phoneNumber != null) {
+        if (phoneNumber != null) {
           FocusScope.of(context).unfocus();
           setState(() {
             _futurePhoneCheck = executeFlow(phoneNumber!);
@@ -267,7 +263,6 @@ class _PhoneCheckAppState extends State<PhoneCheckHome> {
         //Alternatively, we can use checkWithTrace
         //await sdk.checkWithTrace(checkDetails.url);
         //await sdk.isReachable();
-
       } on PlatformException {
         throw Exception('Failed execute platform request');
       }
@@ -280,14 +275,11 @@ class _PhoneCheckAppState extends State<PhoneCheckHome> {
       // }
 
       return fetchPhoneCheckResult(checkDetails.id);
-
     } else {
       throw Exception('Failed to create phone check');
     }
   }
-
 }
-
 
 Future<CheckStatus> fetchPhoneCheckResult(String checkID) async {
   print("[CheckStatus] - Fetching phone check status");
@@ -342,7 +334,7 @@ Future<String> getMockData() {
   });
 }
 
-Future<String> asyncMockData() async{
+Future<String> asyncMockData() async {
   await Future.delayed(Duration(seconds: 10));
   return Future.value("PhoneCheck Mock data");
 }
