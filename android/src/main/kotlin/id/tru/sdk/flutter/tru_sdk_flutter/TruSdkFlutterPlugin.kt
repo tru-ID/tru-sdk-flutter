@@ -74,6 +74,9 @@ class TruSdkFlutterPlugin: FlutterPlugin, MethodCallHandler {
         "isReachable" -> {
           isReachable(result)
         }
+        "isReachableWithDataResidency" -> {
+          isReachableWithDataResidency(call.arguments as String, result)
+        }
         else -> {
           result.notImplemented()
         }
@@ -122,6 +125,24 @@ class TruSdkFlutterPlugin: FlutterPlugin, MethodCallHandler {
     CoroutineScope(Dispatchers.IO).launch {
       try {
         val reachabilityInfo: ReachabilityDetails? = sdk.isReachable()
+
+        val details = reachabilityInfo?.toJsonString()
+
+        launch(Dispatchers.Main) {
+          result.success(details)
+        }
+      } catch (e: Exception) {
+        launch(Dispatchers.Main) {
+          result.error("Exception", "Received an exception ${e.localizedMessage}", e)
+        }
+      }
+    }
+  }
+
+  fun isReachableWithDataResidency(dataResidency: String, result: Result) {
+    CoroutineScope(Dispatchers.IO).launch {
+      try {
+        val reachabilityInfo: ReachabilityDetails? = sdk.isReachable(dataResidency)
 
         val details = reachabilityInfo?.toJsonString()
 

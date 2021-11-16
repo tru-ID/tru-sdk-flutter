@@ -39,6 +39,7 @@ public class SwiftTruSdkFlutterPlugin: NSObject, FlutterPlugin {
         case "check" : check(arguments: call.arguments, result: result)
         case "checkWithTrace": checkWithTrace(arguments: call.arguments, result: result)
         case "isReachable": isReachable(result: result)
+        case "isReachableWithDataResidency": isReachableWithDataResidency(arguments: call.arguments, result: result)
         default:
             result(FlutterMethodNotImplemented)
         }
@@ -99,6 +100,31 @@ public class SwiftTruSdkFlutterPlugin: NSObject, FlutterPlugin {
             }
         }
     }
+
+    func isReachableWithDataResidency(arguments: Any?, result: @escaping FlutterResult) {
+        guard let args = arguments as? String else {
+            result(FlutterError(code: "iOSError",
+                                message: "No dataResidency parameter",
+                                details: nil))
+            return
+        }
+        print("isReachableWithDataResidency called")
+        let sdk = TruSDK()
+        sdk.isReachable(dataResidency: String?) { reachableResult in
+                    switch reachableResult {
+                    case .success(let details):
+                        do {
+                            let jsonData = try JSONEncoder().encode(details)
+                            let jsonString = String(data: jsonData, encoding: .utf8)!
+                             result(jsonString)
+                        } catch  {
+                            result("Unable to decode reachability result")
+                        }
+                    case .failure(let error): result("iOS isReachable() - \(error)")
+                    }
+                }
+            }
+
 }
 
 //result(FlutterError(code: "UNAVAILABLE",
