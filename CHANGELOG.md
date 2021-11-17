@@ -2,6 +2,18 @@
 
 # Change Log
 
+# Version 0.0.6
+
+_2021-11-17_
+
+**Changes**
+
+- Increased tru.ID Android and iOS SDK versions
+
+**New**
+
+- Added isReachableWithDataResidency method exposure
+
 ## Version 0.0.5
 
 _2021-10-08_
