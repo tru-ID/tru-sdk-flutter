@@ -55,6 +55,15 @@ class TruSdkFlutter {
       return e.message;
     }
   }
+
+  Future<String?> isReachableWithDataResidency(String? dataResidency) async {
+    try {
+      return await _channel.invokeMethod(
+          'isReachableWithDataResidency', dataResidency);
+    } on PlatformException catch (e) {
+      return e.message;
+    }
+  }
 }
 
 class ReachabilityDetails {
