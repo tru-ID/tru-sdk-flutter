@@ -85,25 +85,6 @@ tru-sdk-flutter/example/ios
 
 Don't forget to make sure Cocoapods installed on your machine.
 
-## Release History
-- 0.0.6
-  - Android and iOS version increase + isReachableWithdataResidency method exposure
-  
-- 0.0.5
-  - Android version increase + Bug fix to handling isReachable response
-
-- 0.0.4
-  - Add `error` class member to handle `isReachable` error.
-
-- 0.0.3
-  - iOS and Android version increase + Bug fix to isReachable & checkWithTrace methods
-
-- 0.0.2
-  - iOS and Android version increase
-
-- 0.0.1
-  - Initial implementation
-
 
 ## Troubleshooting
 
