@@ -102,7 +102,7 @@ public class SwiftTruSdkFlutterPlugin: NSObject, FlutterPlugin {
     }
 
     func isReachableWithDataResidency(arguments: Any?, result: @escaping FlutterResult) {
-        guard let args = arguments as? String else {
+        guard let dataResidency = arguments as? String else {
             result(FlutterError(code: "iOSError",
                                 message: "No dataResidency parameter",
                                 details: nil))
@@ -110,7 +110,8 @@ public class SwiftTruSdkFlutterPlugin: NSObject, FlutterPlugin {
         }
         print("isReachableWithDataResidency called")
         let sdk = TruSDK()
-        sdk.isReachable(dataResidency: String?) { reachableResult in
+        
+        sdk.isReachable(dataResidency: dataResidency) { reachableResult in
                     switch reachableResult {
                     case .success(let details):
                         do {
