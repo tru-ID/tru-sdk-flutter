@@ -1,9 +1,21 @@
 # tru_sdk_flutter
 
 # Change Log
+# Version 0.1.0
+
+_2022-02-21_
+
+**Changes**
+
+- Increased tru.ID Android and iOS SDK versions
+- Deprecated `check` method deprecated
+
+**New**
+- `checkUrlWithResponseBody` new method
+
 # Version 0.0.7
 
-_2021-01-12_
+_2022-01-12_
 
 **Changes**
 

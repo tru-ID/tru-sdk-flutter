@@ -15,7 +15,7 @@ To add the package `tru_sdk_flutter` to your app project:
 1. Depend on it. Open the `pubspec.yaml` file located inside the app folder and add the following under the dependencies heading:
 
 ```yaml
-	`tru_sdk_flutter: ^0.0.5`
+	`tru_sdk_flutter: ^0.1.0`
 ```
 
 2. Install it
@@ -38,7 +38,7 @@ import 'package:tru_sdk_flutter/tru_sdk_flutter.dart';
 // ...
 TruSdkFlutter sdk = TruSdkFlutter();
 
-await sdk.check(checkUrl);
+await sdk.checkUrlWithResponseBody(checkUrl);
 ```
 
 ## Example Demo
