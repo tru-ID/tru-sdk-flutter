@@ -37,6 +37,7 @@ public class SwiftTruSdkFlutterPlugin: NSObject, FlutterPlugin {
         switch call.method {
         case "getPlatformVersion" : result("iOS " + UIDevice.current.systemVersion)
         case "check" : check(arguments: call.arguments, result: result)
+        case "checkUrlWithResponseBody" : checkUrlWithResponseBody(arguments: call.arguments, result: result)
         case "checkWithTrace": checkWithTrace(arguments: call.arguments, result: result)
         case "isReachable": isReachable(result: result)
         case "isReachableWithDataResidency": isReachableWithDataResidency(arguments: call.arguments, result: result)
@@ -59,6 +60,51 @@ public class SwiftTruSdkFlutterPlugin: NSObject, FlutterPlugin {
                 result("iOS check() - Error [\(error)]")
             } else {
                 result("iOS check() - Success [\(args)]")
+            }
+        }
+    }
+
+    func checkUrlWithResponseBody(arguments: Any?, result: @escaping FlutterResult) {
+        guard let args = arguments as? String else {
+            result(FlutterError(code: "iOSError",
+                                message: "No url parameter",
+                                details: nil))
+            return
+        }
+
+        let sdk = TruSDK()
+        sdk.checkUrlWithResponseBody(url: URL(string: args)!) { error, body in
+            if let error = error {
+                result(FlutterError(code: "iOSError",
+                                    message: error.localizedDescription,
+                                    details: error))
+            } else {
+                if let body = body {
+                    if body["code"] != nil && body["check_id"] != nil {
+                        //return a dictionary with the successful response
+                        let success = [
+                            "code": body["code"],
+                            "check_id": body["check_id"],
+                            "reference_id": body["reference_id"]
+                        ]
+                        result(success)
+                    } else if body["error"] != nil && body["error_description"] != nil {
+                        //return a dictionary with the error response
+                        let failure = [
+                            "error":body["error"],
+                            "error_description":body["error_description"],
+                            "check_id": body["check_id"],
+                            "reference_id": body["reference_id"]  
+                        ]
+                        result(failure)
+                    } else {
+                        result(FlutterError(code: "iOSError",
+                                            message: "There is an issue with response body. Unable to serialise success or error from the dictionary",
+                                            details: error))
+                    }
+                } else {
+                    result([String:Any]()) //Since v0.1 does not return a body, we are returning an empty dictionary
+                }
             }
         }
     }

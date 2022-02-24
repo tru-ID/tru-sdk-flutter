@@ -21,6 +21,7 @@
  * SOFTWARE.
  */
 import 'dart:async';
+import 'dart:collection';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -258,7 +259,7 @@ class _PhoneCheckAppState extends State<PhoneCheckHome> {
 
         TruSdkFlutter sdk = TruSdkFlutter();
         //await performPhoneCheck(checkDetails.url);//This over Flutter http, testing purposes.
-        String? result = await sdk.check(checkDetails.url);
+        Map<Object?, Object?>? result = await sdk.checkUrlWithResponseBody(checkDetails.url);
         print("Check Results -> ${result}");
         //Alternatively, we can use checkWithTrace
         //await sdk.checkWithTrace(checkDetails.url);
