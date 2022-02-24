@@ -21,6 +21,7 @@
  * SOFTWARE.
  */
 import 'dart:async';
+import 'dart:collection';
 import 'package:flutter/services.dart';
 
 class TruSdkFlutter {
@@ -45,6 +46,14 @@ class TruSdkFlutter {
       return await _channel.invokeMethod('checkWithTrace', url);
     } on PlatformException catch (e) {
       return e.message;
+    }
+  }
+
+  Future<Map<Object?, Object?>?> checkUrlWithResponseBody(String url) async {
+    try {
+      return await _channel.invokeMethod('checkUrlWithResponseBody', url);
+    } on PlatformException catch (e) {
+      throw Exception('Failed execute platform request');
     }
   }
 

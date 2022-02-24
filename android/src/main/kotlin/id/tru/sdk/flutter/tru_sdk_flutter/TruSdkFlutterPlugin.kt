@@ -68,6 +68,9 @@ class TruSdkFlutterPlugin: FlutterPlugin, MethodCallHandler {
         "check" -> {
           check(call.arguments as String, result)
         }
+        "checkUrlWithResponseBody" -> {
+          checkUrlWithResponseBody(call.arguments as String, result)
+        }
         "checkWithTrace" -> {
           checkWithTrace(call.arguments as String, result)
         }
@@ -105,6 +108,40 @@ class TruSdkFlutterPlugin: FlutterPlugin, MethodCallHandler {
       }
     }
   }
+
+  fun checkUrlWithResponseBody(url: String, result: Result) {
+    CoroutineScope(Dispatchers.IO).launch {
+      try {
+        val body = sdk.checkUrlWithResponseBody(url)
+        if (body != null) {
+          if (body.has("code") && body.has("check_id")) {
+            val success = mapOf("code" to body.get("code"), "check_id" to body.get("check_id"), "reference_id" to body.get("reference_id"))
+            launch(Dispatchers.Main) {
+              result.success(success)
+            }
+
+          } else if (body.has("error") && body.has("error_description")) {
+            val failure = mapOf("error" to body.get("error"), "error_description" to body.get("error_description"), "check_id" to body.get("check_id"), "reference_id" to body.get("reference_id"))
+            launch(Dispatchers.Main) {
+              result.success(failure)
+            }
+          } else {
+            launch(Dispatchers.Main) {
+              result.error("error", "There is an issue with response body. Unable to serialise success or error from the dictionary", null)
+            }
+          }
+        } else {
+          val emptyMap = emptyMap<String, Any>()
+          result.success(emptyMap) //Since v0.1 does not return a body, we are returning an empty dictionary
+        }
+      } catch (e: Exception) {
+        launch(Dispatchers.Main) {
+          result.error("Exception", "Received an exception ${e.localizedMessage}", e)
+        }
+      }
+    }
+  }
+
 
   fun checkWithTrace(url: String, result: Result) {
     CoroutineScope(Dispatchers.IO).launch {
