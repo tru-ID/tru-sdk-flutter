@@ -1,6 +1,14 @@
 # tru_sdk_flutter
 
 # Change Log
+# Version 0.1.1
+
+_2022-03-08_
+
+**Changes**
+
+- Increased tru.ID Android and iOS SDK versions
+
 # Version 0.1.0
 
 _2022-02-21_
