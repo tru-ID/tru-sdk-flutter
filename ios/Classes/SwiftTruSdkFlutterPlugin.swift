@@ -103,13 +103,12 @@ public class SwiftTruSdkFlutterPlugin: NSObject, FlutterPlugin {
                                             details: error))
                     }
                 } else {
-                    result([String:Any]()) //Since v0.1 does not return a body, we are returning an empty dictionary
+                    result(nil) //Since v0.1 does not return a body, we are returning nil
                 }
             }
         }
     }
 
-    //TODO: Return serialised TraceInfo
     func checkWithTrace(arguments: Any?, result: @escaping FlutterResult) {
         guard let args = arguments as? String else {
             result(FlutterError(code: "iOSError",
@@ -121,10 +120,45 @@ public class SwiftTruSdkFlutterPlugin: NSObject, FlutterPlugin {
         let sdk = TruSDK()
         sdk.checkWithTrace(url: URL(string: args)!) { error, traceInfo in
             if let error = error {
-                result("iOS checkWithTrace() - Error [\(error)]")
-                return
+                result(FlutterError(code: "iOSError",
+                                    message: error.localizedDescription,
+                                    details: error))
+            } else {
+                if let body = traceInfo?.responseBody {
+                    if body["code"] != nil && body["check_id"] != nil {
+                        //return a dictionary with the successful response
+                        let success = [
+                            "code": body["code"],
+                            "check_id": body["check_id"],
+                            "reference_id": body["reference_id"],
+                            "trace": traceInfo?.trace
+                        ]
+                        result(success)
+                        print("Plugin", "checkWithTrace Success")
+                    } else if body["error"] != nil && body["error_description"] != nil {
+                        //return a dictionary with the error response
+                        let failure = [
+                            "error":body["error"],
+                            "error_description":body["error_description"],
+                            "check_id": body["check_id"],
+                            "reference_id": body["reference_id"],
+                            "trace": traceInfo?.trace
+                        ]
+                        result(failure)
+                        print("Plugin", "checkWithTrace Failure")
+                    } else {
+                        result(FlutterError(code: "iOSError",
+                                            message: "There is an issue with response body. Unable to serialise success or error from the dictionary",
+                                            details: error))
+                    }
+                } else {
+                    let responseWithTrace = [
+                      "trace": traceInfo?.trace,
+                    ]
+                    result(responseWithTrace) //Since v0.1 does not return a body, we are returning just the trace
+                    print("Plugin", "checkWithTrace Trace")
+                }
             }
-            result("iOS checkWithTrace() - Success [\(args)]")
         }
     }
 
