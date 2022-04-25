@@ -139,22 +139,65 @@ class TruSdkFlutterPlugin: FlutterPlugin, MethodCallHandler {
           result.error("Exception", "Received an exception ${e.localizedMessage}", e)
         }
       }
+
     }
   }
 
 
   fun checkWithTrace(url: String, result: Result) {
     CoroutineScope(Dispatchers.IO).launch {
+//      try {
+//        val traceInfo = sdk.checkWithTrace(URL(url))
+//        launch(Dispatchers.Main) {
+//          result.success("${traceInfo.trace}")
+//        }
+//      } catch (e: Exception) {
+//        launch(Dispatchers.Main) {
+//          result.error("Exception", "Received an exception ${e.localizedMessage}", e)
+//        }
+//      }
       try {
         val traceInfo = sdk.checkWithTrace(URL(url))
-        launch(Dispatchers.Main) {
-          result.success("${traceInfo.trace}")
+        val body = traceInfo.responseBody
+        if (body != null) {
+          if (body.has("code") && body.has("check_id")) {
+            val success = mapOf(
+              "code" to body.get("code"),
+              "check_id" to body.get("check_id"),
+              "reference_id" to body.get("reference_id"),
+              "trace" to traceInfo.trace)
+            launch(Dispatchers.Main) {
+              result.success(success)
+            }
+            println("checkWithTrace Success")
+
+          } else if (body.has("error") && body.has("error_description")) {
+            val failure = mapOf(
+              "error" to body.get("error"),
+              "error_description" to body.get("error_description"),
+              "check_id" to body.get("check_id"),
+              "reference_id" to body.get("reference_id"),
+              "trace" to traceInfo.trace)
+            launch(Dispatchers.Main) {
+              result.success(failure)
+              println("checkWithTrace Failure")
+            }
+          } else {
+            launch(Dispatchers.Main) {
+              result.error("error", "There is an issue with response body. Unable to serialise success or error from the dictionary", null)
+            }
+          }
+        } else {
+          val checkWithTrace = mapOf("trace" to traceInfo.trace)
+          result.success(checkWithTrace) //Since v0.1 does not return a body, we are returning an empty dictionary
+          println("checkWithTrace no body")
         }
       } catch (e: Exception) {
         launch(Dispatchers.Main) {
           result.error("Exception", "Received an exception ${e.localizedMessage}", e)
         }
       }
+
     }
   }
 

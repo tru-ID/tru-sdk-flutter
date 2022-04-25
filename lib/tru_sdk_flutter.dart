@@ -41,11 +41,11 @@ class TruSdkFlutter {
     }
   }
 
-  Future<String?> checkWithTrace(String url) async {
+  Future<Map<Object?, Object?>?> checkWithTrace(String url) async {
     try {
       return await _channel.invokeMethod('checkWithTrace', url);
     } on PlatformException catch (e) {
-      return e.message;
+      throw Exception('Failed execute platform request');
     }
   }
 

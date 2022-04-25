@@ -1,6 +1,18 @@
 # tru_sdk_flutter
 
 # Change Log
+# Version 0.1.3
+
+_2022-04-22_
+
+**Changes**
+
+- Increased tru.ID Android and iOS SDK versions
+
+**Bug Fixes**
+
+- Amended checkWithTrace method
+
 # Version 0.1.2
 
 _2022-03-28_

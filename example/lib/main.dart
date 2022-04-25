@@ -258,12 +258,15 @@ class _PhoneCheckAppState extends State<PhoneCheckHome> {
         // String platformVersion = await Trusdkflutter.platformVersion ?? 'Unknown platform version';
 
         TruSdkFlutter sdk = TruSdkFlutter();
-        //await performPhoneCheck(checkDetails.url);//This over Flutter http, testing purposes.
         Map<Object?, Object?>? result = await sdk.checkUrlWithResponseBody(checkDetails.url);
         print("Check Results -> ${result}");
+
         //Alternatively, we can use checkWithTrace
         //await sdk.checkWithTrace(checkDetails.url);
         //await sdk.isReachable();
+        // Map<Object?, Object?>? result = await sdk.checkWithTrace(checkDetails.url);
+        // print("Check Results -> ${result}");
+
       } on PlatformException {
         throw Exception('Failed execute platform request');
       }
