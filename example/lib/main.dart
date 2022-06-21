@@ -340,6 +340,9 @@ Future<CheckStatus> exchangeCode(
   final response = await http.post(
     Uri.parse('$baseURL/v0.2/phone-check/exchange-code'),
     body: body,
+    headers: <String, String>{
+      'content-type': 'application/json; charset=UTF-8',
+    },
   );
 print("response request ${response.request}");
   if (response.statusCode == 200) {
