@@ -82,10 +82,11 @@ public class SwiftTruSdkFlutterPlugin: NSObject, FlutterPlugin {
                 if let body = body {
                     if body["code"] != nil && body["check_id"] != nil {
                         //return a dictionary with the successful response
+                    
                         let success = [
                             "code": body["code"],
                             "check_id": body["check_id"],
-                            "reference_id": body["reference_id"]
+                            "reference_id": body["reference_id"] ?? ""
                         ]
                         result(success)
                     } else if body["error"] != nil && body["error_description"] != nil {

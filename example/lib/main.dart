@@ -23,6 +23,7 @@
 import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
+import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -105,7 +106,7 @@ class _PhoneCheckAppState extends State<PhoneCheckHome> {
               validatingFormField(),
               const SizedBox(height: 24),
               verifyButton(),
-              Text((_result == null) ? "" : "Results ${_result}")
+              Text((_result == null) ? "" : "Results $_result")
             ],
           ),
         ),
@@ -113,6 +114,11 @@ class _PhoneCheckAppState extends State<PhoneCheckHome> {
     );
   }
 
+// TO BE USED WITHIN v0.1 endpoint
+// As checkWithUrlResponse method does not return any body within v0.1 endpoint you will need to add
+// type void as a return type to the checkWithUrlResponse method description at the index.tsx file.
+//
+// Step 2 for v0.1
   FutureBuilder<CheckStatus> buildFutureBuilder() {
     return FutureBuilder<CheckStatus>(
       future: _futurePhoneCheck,
@@ -240,7 +246,7 @@ class _PhoneCheckAppState extends State<PhoneCheckHome> {
   Future<CheckStatus> executeFlow(String phoneNumber) async {
     print("[PhoneCheck] - Creating phone check");
     final response = await http.post(
-      Uri.parse('$baseURL/phone-check'),
+      Uri.parse('$baseURL/v0.2/phone-check'),
       headers: <String, String>{
         'content-type': 'application/json; charset=UTF-8',
       },
@@ -254,12 +260,15 @@ class _PhoneCheckAppState extends State<PhoneCheckHome> {
       PhoneCheck checkDetails = PhoneCheck.fromJson(jsonDecode(response.body));
       // Platform messages may fail, so we use a try/catch PlatformException.
       // We also handle the message potentially returning null.
+
+
       try {
         // String platformVersion = await Trusdkflutter.platformVersion ?? 'Unknown platform version';
 
         TruSdkFlutter sdk = TruSdkFlutter();
-        Map<Object?, Object?>? result = await sdk.checkUrlWithResponseBody(checkDetails.url);
-        print("Check Results -> ${result}");
+        Map<Object?, Object?>? result =
+            await sdk.checkUrlWithResponseBody(checkDetails.url);
+        print("CheckWithUrlResponseBody Results -> $result");
 
         //Alternatively, we can use checkWithTrace
         //await sdk.checkWithTrace(checkDetails.url);
@@ -267,6 +276,23 @@ class _PhoneCheckAppState extends State<PhoneCheckHome> {
         // Map<Object?, Object?>? result = await sdk.checkWithTrace(checkDetails.url);
         // print("Check Results -> ${result}");
 
+        if (result != null) {
+          if (result["code"] != null) {
+            try {
+              if (result['reference_id'] == null) {
+                result['reference_id'] = "";
+              }
+              return exchangeCode(result['check_id'] as String, result['code'] as String, result['reference_id'] as String);
+            } catch (error) {
+              print(error);
+              throw Exception('result returns error');
+            }
+          } else {
+            throw Exception('result from checkWithUrl is with Error');
+          }
+        } else {
+          throw Exception('result from checkWithUrl is empty');
+        }
       } on PlatformException {
         throw Exception('Failed execute platform request');
       }
@@ -278,17 +304,20 @@ class _PhoneCheckAppState extends State<PhoneCheckHome> {
       //   return;
       // }
 
-      return fetchPhoneCheckResult(checkDetails.id);
+
+      // return fetchPhoneCheckResult(checkDetails.id);
+
     } else {
       throw Exception('Failed to create phone check');
     }
   }
 }
 
+//v0.2 Step 3 for v0.1
 Future<CheckStatus> fetchPhoneCheckResult(String checkID) async {
   print("[CheckStatus] - Fetching phone check status");
   final response = await http.get(
-    Uri.parse('$baseURL/phone-check?check_id=${checkID}'),
+    Uri.parse('$baseURL/phone-check?check_id=$checkID'),
   );
 
   print("[CheckStatus] - Received response");
@@ -297,6 +326,34 @@ Future<CheckStatus> fetchPhoneCheckResult(String checkID) async {
     return CheckStatus.fromJson(jsonDecode(response.body));
   } else {
     throw Exception('Failed to fetching phone check status');
+  }
+}
+
+Future<CheckStatus> exchangeCode(
+    String checkID, String code, String referenceID) async {
+  var body = jsonEncode(<String, String>{
+    'code': code,
+    'check_id': checkID,
+    'reference_id': ""
+  });
+
+  final response = await http.post(
+    Uri.parse('$baseURL/v0.2/phone-check/exchange-code'),
+    body: body,
+  );
+print("response request ${response.request}");
+  if (response.statusCode == 200) {
+    CheckStatus exchangeCheckRes =
+        CheckStatus.fromJson(jsonDecode(response.body));
+    print("Exchange Check Result $exchangeCheckRes");
+    if (exchangeCheckRes.match) {
+      print("✅ successful PhoneCheck match");
+    } else {
+      print("❌ failed PhoneCheck match");
+    }
+    return exchangeCheckRes;
+  } else {
+    throw Exception('Failed to exchange Code');
   }
 }
 
