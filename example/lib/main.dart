@@ -114,11 +114,6 @@ class _PhoneCheckAppState extends State<PhoneCheckHome> {
     );
   }
 
-// TO BE USED WITHIN v0.1 endpoint
-// As checkWithUrlResponse method does not return any body within v0.1 endpoint you will need to add
-// type void as a return type to the checkWithUrlResponse method description at the index.tsx file.
-//
-// Step 2 for v0.1
   FutureBuilder<CheckStatus> buildFutureBuilder() {
     return FutureBuilder<CheckStatus>(
       future: _futurePhoneCheck,
@@ -246,7 +241,7 @@ class _PhoneCheckAppState extends State<PhoneCheckHome> {
   Future<CheckStatus> executeFlow(String phoneNumber) async {
     print("[PhoneCheck] - Creating phone check");
     final response = await http.post(
-      Uri.parse('$baseURL/v0.2/phone-check'),
+      Uri.parse('$baseURL/v0.2/phone-check'), // for v0.1 use '/v0.1/phone-check'
       headers: <String, String>{
         'content-type': 'application/json; charset=UTF-8',
       },
@@ -260,22 +255,14 @@ class _PhoneCheckAppState extends State<PhoneCheckHome> {
       PhoneCheck checkDetails = PhoneCheck.fromJson(jsonDecode(response.body));
       // Platform messages may fail, so we use a try/catch PlatformException.
       // We also handle the message potentially returning null.
-
-
       try {
         // String platformVersion = await Trusdkflutter.platformVersion ?? 'Unknown platform version';
-
         TruSdkFlutter sdk = TruSdkFlutter();
         Map<Object?, Object?>? result =
             await sdk.checkUrlWithResponseBody(checkDetails.url);
         print("CheckWithUrlResponseBody Results -> $result");
 
-        //Alternatively, we can use checkWithTrace
-        //await sdk.checkWithTrace(checkDetails.url);
-        //await sdk.isReachable();
-        // Map<Object?, Object?>? result = await sdk.checkWithTrace(checkDetails.url);
-        // print("Check Results -> ${result}");
-
+        // v0.2 Only
         if (result != null) {
           if (result["code"] != null) {
             try {
@@ -304,7 +291,7 @@ class _PhoneCheckAppState extends State<PhoneCheckHome> {
       //   return;
       // }
 
-
+      // Step 3 for v0.1
       // return fetchPhoneCheckResult(checkDetails.id);
 
     } else {
@@ -313,11 +300,11 @@ class _PhoneCheckAppState extends State<PhoneCheckHome> {
   }
 }
 
-//v0.2 Step 3 for v0.1
+//v0.1 Only
 Future<CheckStatus> fetchPhoneCheckResult(String checkID) async {
   print("[CheckStatus] - Fetching phone check status");
   final response = await http.get(
-    Uri.parse('$baseURL/phone-check?check_id=$checkID'),
+    Uri.parse('$baseURL/v0.1/phone-check?check_id=$checkID'),
   );
 
   print("[CheckStatus] - Received response");
@@ -325,16 +312,16 @@ Future<CheckStatus> fetchPhoneCheckResult(String checkID) async {
     print('Response: ${response.body}');
     return CheckStatus.fromJson(jsonDecode(response.body));
   } else {
-    throw Exception('Failed to fetching phone check status');
+    throw Exception('Failed to fetch phone check status');
   }
 }
-
+//v0.2 Only
 Future<CheckStatus> exchangeCode(
     String checkID, String code, String referenceID) async {
   var body = jsonEncode(<String, String>{
     'code': code,
     'check_id': checkID,
-    'reference_id': ""
+    'reference_id': referenceID
   });
 
   final response = await http.post(

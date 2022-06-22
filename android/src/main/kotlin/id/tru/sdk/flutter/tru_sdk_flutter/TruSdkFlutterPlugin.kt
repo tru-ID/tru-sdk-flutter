@@ -115,13 +115,13 @@ class TruSdkFlutterPlugin: FlutterPlugin, MethodCallHandler {
         val body = sdk.checkUrlWithResponseBody(url)
         if (body != null) {
           if (body.has("code") && body.has("check_id")) {
-            val success = mapOf("code" to body.get("code"), "check_id" to body.get("check_id"), "reference_id" to "" )
+            val success = mapOf("code" to body.get("code"), "check_id" to body.get("check_id"), "reference_id" to body.get("reference_id") )
             launch(Dispatchers.Main) {
               result.success(success)
             }
 
           } else if (body.has("error") && body.has("error_description")) {
-            val failure = mapOf("error" to body.get("error"), "error_description" to body.get("error_description"), "check_id" to body.get("check_id"), "reference_id" to "")
+            val failure = mapOf("error" to body.get("error"), "error_description" to body.get("error_description"), "check_id" to body.get("check_id"), "reference_id" to body.get("reference_id"))
             launch(Dispatchers.Main) {
               result.success(failure)
             }
