@@ -1,6 +1,15 @@
 # tru_sdk_flutter
 
 # Change Log
+# Version 0.1.4
+
+_2022-06-16_
+
+**Changes**
+
+- Increased tru.ID Android and iOS SDK versions
+- Changed PhoneCheck API to v0.2
+
 # Version 0.1.3
 
 _2022-04-22_
