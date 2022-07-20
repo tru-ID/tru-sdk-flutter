@@ -1,6 +1,14 @@
 # tru_sdk_flutter
 
 # Change Log
+# Version 0.1.5
+
+_2022-07-21_
+
+**Bug Fixes**
+
+- iOS: isReachable and isReachableWithDataResidency
+
 # Version 0.1.4
 
 _2022-06-16_
