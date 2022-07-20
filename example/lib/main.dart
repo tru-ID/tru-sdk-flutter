@@ -33,7 +33,7 @@ import 'package:tru_sdk_flutter/tru_sdk_flutter.dart';
 import 'src/http/mock_client.dart';
 
 // Set up a local tunnel base url.
-final String baseURL = "<YOUR_LOCAL_TUNNEL_URL>";
+final String baseURL = "https://a57a-94-54-24-247.ngrok.io";
 
 void main() {
   runApp(PhoneCheckApp());
@@ -239,6 +239,15 @@ class _PhoneCheckAppState extends State<PhoneCheckHome> {
 
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<CheckStatus> executeFlow(String phoneNumber) async {
+    print("[Reachability] - Start");
+    TruSdkFlutter sdk = TruSdkFlutter();
+    try {
+      String? reach = await sdk.isReachable();
+      print("isReachable = ${reach}");
+    } on PlatformException catch (e) {
+      print("isReachable Error: ${e.toString()}");
+      throw Exception('reachability failed');
+    }
     print("[PhoneCheck] - Creating phone check");
     final response = await http.post(
       Uri.parse('$baseURL/v0.2/phone-check'), // for v0.1 use '/v0.1/phone-check'
@@ -257,7 +266,7 @@ class _PhoneCheckAppState extends State<PhoneCheckHome> {
       // We also handle the message potentially returning null.
       try {
         // String platformVersion = await Trusdkflutter.platformVersion ?? 'Unknown platform version';
-        TruSdkFlutter sdk = TruSdkFlutter();
+        // TruSdkFlutter sdk = TruSdkFlutter();
         Map<Object?, Object?>? result =
             await sdk.checkUrlWithResponseBody(checkDetails.url);
         print("CheckWithUrlResponseBody Results -> $result");
