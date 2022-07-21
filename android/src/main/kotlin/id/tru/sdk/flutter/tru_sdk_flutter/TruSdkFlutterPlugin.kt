@@ -38,6 +38,8 @@ import java.lang.Exception
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.encodeToString
 import java.io.Serializable
 import java.net.URL
 
@@ -205,15 +207,25 @@ class TruSdkFlutterPlugin: FlutterPlugin, MethodCallHandler {
     CoroutineScope(Dispatchers.IO).launch {
       try {
         val reachabilityInfo: ReachabilityDetails? = sdk.isReachable()
-
-        val details = reachabilityInfo?.toJsonString()
-
         launch(Dispatchers.Main) {
-          result.success(details)
+          if (reachabilityInfo == null) {
+            val failure = mapOf("status" to "-1", "detail" to "Unable to decode reachability result")
+            val jsonData = Json.encodeToString(failure)
+            result.error("ReachabilityError", jsonData, "Reachability null error")
+          } else {
+            val details = reachabilityInfo?.toJsonString()
+            result.success(details)
+          }
         }
       } catch (e: Exception) {
-        launch(Dispatchers.Main) {
-          result.error("Exception", "Received an exception ${e.localizedMessage}", e)
+        launch { Dispatchers.Main }
+        try {
+          val jsonData = Json.encodeToString(e)
+          result.success((jsonData))
+        } catch (e: Exception){
+          launch(Dispatchers.Main) {
+            result.error("Exception", "Received an exception ${e.localizedMessage}", e)
+          }
         }
       }
     }

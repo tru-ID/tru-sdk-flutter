@@ -177,7 +177,14 @@ public class SwiftTruSdkFlutterPlugin: NSObject, FlutterPlugin {
                 } catch  {
                     result("Unable to decode reachability result")
                 }
-            case .failure(let error): result("iOS isReachable() - \(error)")
+            case .failure(let error): 
+                do {
+                    let jsonData = try JSONEncoder().encode(error)
+                    let jsonString = String(data: jsonData, encoding: .utf8)!
+                     result(jsonString)
+                } catch  {
+                    result("iOS isReachable() - \(error)")
+                }
             }
         }
     }
@@ -193,22 +200,26 @@ public class SwiftTruSdkFlutterPlugin: NSObject, FlutterPlugin {
         let sdk = TruSDK()
         
         sdk.isReachable(dataResidency: dataResidency) { reachableResult in
-                    switch reachableResult {
-                    case .success(let details):
-                        do {
-                            let jsonData = try JSONEncoder().encode(details)
-                            let jsonString = String(data: jsonData, encoding: .utf8)!
-                             result(jsonString)
-                        } catch  {
-                            result("Unable to decode reachability result")
-                        }
-                    case .failure(let error): result("iOS isReachable() - \(error)")
-                    }
+            switch reachableResult {
+            case .success(let details):
+                do {
+                    let jsonData = try JSONEncoder().encode(details)
+                    let jsonString = String(data: jsonData, encoding: .utf8)!
+                        result(jsonString)
+                } catch  {
+                    result("Unable to decode reachability result")
+                }
+            case .failure(let error):                 
+                do {
+                    let jsonData = try JSONEncoder().encode(error)
+                    let jsonString = String(data: jsonData, encoding: .utf8)!
+                    result(jsonString)
+                } catch  {
+                    result("iOS isReachable() - \(error)")
                 }
             }
+        }
+    }
 
 }
 
-//result(FlutterError(code: "UNAVAILABLE",
-//                    message: "Battery info unavailable",
-//

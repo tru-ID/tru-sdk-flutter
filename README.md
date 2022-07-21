@@ -7,6 +7,7 @@ Before you begin, you will need to:
 - For iOS: Xcode 12+ required
 - For Android: Android Studio version 3.0 or later
 - A mobile phone with mobile data connection.
+- Install [Flutter](https://docs.flutter.dev/get-started/install/macos#deploy-to-ios-devices)
 
 ## Installation
 
@@ -15,7 +16,7 @@ To add the package `tru_sdk_flutter` to your app project:
 1. Depend on it. Open the `pubspec.yaml` file located inside the app folder and add the following under the dependencies heading:
 
 ```yaml
-	`tru_sdk_flutter: ^0.1.3`
+	`tru_sdk_flutter: ^0.1.5`
 ```
 
 2. Install it
@@ -83,7 +84,11 @@ tru-sdk-flutter/example/android
 iOS Example\
 tru-sdk-flutter/example/ios
 
-Don't forget to make sure Cocoapods installed on your machine.
+Don't forget to make sure Cocoapods installed on your machine and install pods to example.
+```
+cd ios
+pod install
+```
 
 
 ## Troubleshooting

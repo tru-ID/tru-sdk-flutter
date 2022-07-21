@@ -33,7 +33,7 @@ import 'package:tru_sdk_flutter/tru_sdk_flutter.dart';
 import 'src/http/mock_client.dart';
 
 // Set up a local tunnel base url.
-final String baseURL = "<YOUR_LOCAL_TUNNEL_URL>";
+final String baseURL = "YOUR_LOCAL_TUNNEL_URL";
 
 void main() {
   runApp(PhoneCheckApp());
@@ -239,63 +239,87 @@ class _PhoneCheckAppState extends State<PhoneCheckHome> {
 
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<CheckStatus> executeFlow(String phoneNumber) async {
-    print("[PhoneCheck] - Creating phone check");
-    final response = await http.post(
-      Uri.parse('$baseURL/v0.2/phone-check'), // for v0.1 use '/v0.1/phone-check'
-      headers: <String, String>{
-        'content-type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, String>{
-        'phone_number': phoneNumber,
-      }),
-    );
-
-    print("[PhoneCheck] - Received response");
-    if (response.statusCode == 200) {
-      PhoneCheck checkDetails = PhoneCheck.fromJson(jsonDecode(response.body));
-      // Platform messages may fail, so we use a try/catch PlatformException.
-      // We also handle the message potentially returning null.
-      try {
-        // String platformVersion = await Trusdkflutter.platformVersion ?? 'Unknown platform version';
-        TruSdkFlutter sdk = TruSdkFlutter();
-        Map<Object?, Object?>? result =
-            await sdk.checkUrlWithResponseBody(checkDetails.url);
-        print("CheckWithUrlResponseBody Results -> $result");
-
-        // v0.2 Only
-        if (result != null) {
-          if (result["code"] != null) {
-            try {
-              if (result['reference_id'] == null) {
-                result['reference_id'] = "";
-              }
-              return exchangeCode(result['check_id'] as String, result['code'] as String, result['reference_id'] as String);
-            } catch (error) {
-              print(error);
-              throw Exception('result returns error');
-            }
+    print("[Reachability] - Start");
+    TruSdkFlutter sdk = TruSdkFlutter();
+    try {
+      String? reach = await sdk.isReachable();
+      print("isReachable = ${reach}");
+      if (reach != null) {
+        Map<String, dynamic> jsonReach = jsonDecode(reach);
+        if (jsonReach.containsKey("status")) { //if status exists, there is an error
+          if (jsonReach["status"] == "400" || jsonReach["status"] == "412") {
+          // We should not be proceeding with the phoneCheck and display an error to the user
+            throw Exception('Either MNO Not Supported or No Data Cellular Connectivity');
           } else {
-            throw Exception('result from checkWithUrl is with Error');
+            throw Exception('Status = ${jsonReach["status"]} - ${jsonReach["detail"]}');
           }
         } else {
-          throw Exception('result from checkWithUrl is empty');
-        }
-      } on PlatformException {
-        throw Exception('Failed execute platform request');
-      }
+          //everything is fine
+          print("[PhoneCheck] - Creating phone check");
+          final response = await http.post(
+            Uri.parse('$baseURL/v0.2/phone-check'), // for v0.1 use '/v0.1/phone-check'
+            headers: <String, String>{
+              'content-type': 'application/json; charset=UTF-8',
+            },
+            body: jsonEncode(<String, String>{
+              'phone_number': phoneNumber,
+            }),
+          );
 
-      // If the widget was removed from the tree while the asynchronous platform
-      // message was in flight, we want to discard the reply rather than calling
-      // setState to update our non-existent appearance.
-      // if (!mounted) {
-      //   return;
-      // }
+          print("[PhoneCheck] - Received response");
+          if (response.statusCode == 200) {
+            PhoneCheck checkDetails = PhoneCheck.fromJson(jsonDecode(response.body));
+            // Platform messages may fail, so we use a try/catch PlatformException.
+            // We also handle the message potentially returning null.
+            try {
+              // String platformVersion = await Trusdkflutter.platformVersion ?? 'Unknown platform version';
+              // TruSdkFlutter sdk = TruSdkFlutter();
+              Map<Object?, Object?>? result =
+              await sdk.checkUrlWithResponseBody(checkDetails.url);
+              print("CheckWithUrlResponseBody Results -> $result");
 
-      // Step 3 for v0.1
-      // return fetchPhoneCheckResult(checkDetails.id);
+              // v0.2 Only
+              if (result != null) {
+                if (result["code"] != null) {
+                  try {
+                    if (result['reference_id'] == null) {
+                      result['reference_id'] = "";
+                    }
+                    return exchangeCode(result['check_id'] as String, result['code'] as String, result['reference_id'] as String);
+                  } catch (error) {
+                    print(error);
+                    throw Exception('result returns error');
+                  }
+                } else {
+                  throw Exception('result from checkWithUrl is with Error');
+                }
+              } else {
+                throw Exception('result from checkWithUrl is empty');
+              }
+            } on PlatformException {
+              throw Exception('Failed execute platform request');
+            }
 
+            // If the widget was removed from the tree while the asynchronous platform
+            // message was in flight, we want to discard the reply rather than calling
+            // setState to update our non-existent appearance.
+            // if (!mounted) {
+            //   return;
+            // }
+
+            // Step 3 for v0.1
+            // return fetchPhoneCheckResult(checkDetails.id);
+
+          } else {
+            throw Exception('Failed to create phone check');
+          }
+        }//else for reachability success scenario
     } else {
-      throw Exception('Failed to create phone check');
+        throw Exception('Failed to acquire Reachability Details');
+      }
+    } on PlatformException catch (e) {
+      print("isReachable Error: ${e.toString()}");
+      throw Exception('reachability failed');
     }
   }
 }
