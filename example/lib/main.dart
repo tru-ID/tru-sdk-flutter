@@ -249,8 +249,9 @@ class _PhoneCheckAppState extends State<PhoneCheckHome> {
         if (jsonReach.containsKey("status")) { //if status exists, there is an error
           if (jsonReach["status"] == "400" || jsonReach["status"] == "412") {
           // We should not be proceeding with the phoneCheck and display an error to the user
-            throw Exception('Either MNO Not Supported or No Data Cellular Connectivity');
-          } else {
+            throw Exception('Either MNO Not Supported or Not a Mobile IP');
+          } else { 
+          // No Data Connectivity - Ask the end-user to turn on Mobile Data
             throw Exception('Status = ${jsonReach["status"]} - ${jsonReach["detail"]}');
           }
         } else {
@@ -315,6 +316,7 @@ class _PhoneCheckAppState extends State<PhoneCheckHome> {
           }
         }//else for reachability success scenario
     } else {
+        // No Data Connectivity - Ask the end-user to turn on Mobile Data
         throw Exception('Failed to acquire Reachability Details');
       }
     } on PlatformException catch (e) {
