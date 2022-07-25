@@ -246,19 +246,21 @@ class _PhoneCheckAppState extends State<PhoneCheckHome> {
       print("isReachable = ${reach}");
       if (reach != null) {
         Map<String, dynamic> jsonReach = jsonDecode(reach);
-        if (jsonReach.containsKey("status")) { //if status exists, there is an error
+        if (jsonReach.containsKey("status")) {
+          //if status exists, there is an error
           if (jsonReach["status"] == "400" || jsonReach["status"] == "412") {
-          // We should not be proceeding with the phoneCheck and display an error to the user
+            // We should not be proceeding with the phoneCheck and display an error to the user
             throw Exception('Either MNO Not Supported or Not a Mobile IP');
-          } else { 
-          // No Data Connectivity - Ask the end-user to turn on Mobile Data
-            throw Exception('Status = ${jsonReach["status"]} - ${jsonReach["detail"]}');
+          } else {
+            // No Data Connectivity - Ask the end-user to turn on Mobile Data
+            throw Exception(
+                'Status = ${jsonReach["status"]} - ${jsonReach["detail"]}');
           }
         } else {
           //everything is fine
           print("[PhoneCheck] - Creating phone check");
           final response = await http.post(
-            Uri.parse('$baseURL/v0.2/phone-check'), // for v0.1 use '/v0.1/phone-check'
+            Uri.parse('$baseURL/v0.2/phone-check'),
             headers: <String, String>{
               'content-type': 'application/json; charset=UTF-8',
             },
@@ -269,14 +271,11 @@ class _PhoneCheckAppState extends State<PhoneCheckHome> {
 
           print("[PhoneCheck] - Received response");
           if (response.statusCode == 200) {
-            PhoneCheck checkDetails = PhoneCheck.fromJson(jsonDecode(response.body));
-            // Platform messages may fail, so we use a try/catch PlatformException.
-            // We also handle the message potentially returning null.
+            PhoneCheck checkDetails =
+                PhoneCheck.fromJson(jsonDecode(response.body));
             try {
-              // String platformVersion = await Trusdkflutter.platformVersion ?? 'Unknown platform version';
-              // TruSdkFlutter sdk = TruSdkFlutter();
               Map<Object?, Object?>? result =
-              await sdk.checkUrlWithResponseBody(checkDetails.url);
+                  await sdk.checkUrlWithResponseBody(checkDetails.url);
               print("CheckWithUrlResponseBody Results -> $result");
 
               // v0.2 Only
@@ -286,36 +285,30 @@ class _PhoneCheckAppState extends State<PhoneCheckHome> {
                     if (result['reference_id'] == null) {
                       result['reference_id'] = "";
                     }
-                    return exchangeCode(result['check_id'] as String, result['code'] as String, result['reference_id'] as String);
+                    return exchangeCode(
+                        result['check_id'] as String,
+                        result['code'] as String,
+                        result['reference_id'] as String);
                   } catch (error) {
                     print(error);
                     throw Exception('result returns error');
                   }
+                } else if (result.isEmpty) {
+                  throw Exception('result from checkWithUrl is empty');
                 } else {
                   throw Exception('result from checkWithUrl is with Error');
                 }
               } else {
-                throw Exception('result from checkWithUrl is empty');
+                throw Exception('result from checkWithUrl is null');
               }
             } on PlatformException {
               throw Exception('Failed execute platform request');
             }
-
-            // If the widget was removed from the tree while the asynchronous platform
-            // message was in flight, we want to discard the reply rather than calling
-            // setState to update our non-existent appearance.
-            // if (!mounted) {
-            //   return;
-            // }
-
-            // Step 3 for v0.1
-            // return fetchPhoneCheckResult(checkDetails.id);
-
           } else {
             throw Exception('Failed to create phone check');
           }
-        }//else for reachability success scenario
-    } else {
+        } //else for reachability success scenario
+      } else {
         // No Data Connectivity - Ask the end-user to turn on Mobile Data
         throw Exception('Failed to acquire Reachability Details');
       }
@@ -341,6 +334,7 @@ Future<CheckStatus> fetchPhoneCheckResult(String checkID) async {
     throw Exception('Failed to fetch phone check status');
   }
 }
+
 //v0.2 Only
 Future<CheckStatus> exchangeCode(
     String checkID, String code, String referenceID) async {
@@ -357,7 +351,7 @@ Future<CheckStatus> exchangeCode(
       'content-type': 'application/json; charset=UTF-8',
     },
   );
-print("response request ${response.request}");
+  print("response request ${response.request}");
   if (response.statusCode == 200) {
     CheckStatus exchangeCheckRes =
         CheckStatus.fromJson(jsonDecode(response.body));

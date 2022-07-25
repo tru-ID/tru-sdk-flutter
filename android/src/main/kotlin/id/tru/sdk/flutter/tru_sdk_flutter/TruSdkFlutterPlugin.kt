@@ -129,7 +129,9 @@ class TruSdkFlutterPlugin: FlutterPlugin, MethodCallHandler {
             }
           } else {
             launch(Dispatchers.Main) {
-              result.error("error", "There is an issue with response body. Unable to serialise success or error from the dictionary", null)
+              val failure = mapOf("status" to "-1", "detail" to "Unable to decode response body.")
+              val jsonData = Json.encodeToString(failure)
+              result.error("Exception", jsonData, "Unable to decode response body.")
             }
           }
         } else {
@@ -148,16 +150,6 @@ class TruSdkFlutterPlugin: FlutterPlugin, MethodCallHandler {
 
   fun checkWithTrace(url: String, result: Result) {
     CoroutineScope(Dispatchers.IO).launch {
-//      try {
-//        val traceInfo = sdk.checkWithTrace(URL(url))
-//        launch(Dispatchers.Main) {
-//          result.success("${traceInfo.trace}")
-//        }
-//      } catch (e: Exception) {
-//        launch(Dispatchers.Main) {
-//          result.error("Exception", "Received an exception ${e.localizedMessage}", e)
-//        }
-//      }
       try {
         val traceInfo = sdk.checkWithTrace(URL(url))
         val body = traceInfo.responseBody
@@ -186,8 +178,10 @@ class TruSdkFlutterPlugin: FlutterPlugin, MethodCallHandler {
             }
           } else {
             launch(Dispatchers.Main) {
-              result.error("error", "There is an issue with response body. Unable to serialise success or error from the dictionary", null)
-            }
+              val failure = mapOf("status" to "-1", "detail" to "Unable to decode response body.")
+              val jsonData = Json.encodeToString(failure)
+              result.error("Exception", jsonData, "Unable to decode response body.")
+           }
           }
         } else {
           val checkWithTrace = mapOf("trace" to traceInfo.trace)
@@ -209,7 +203,7 @@ class TruSdkFlutterPlugin: FlutterPlugin, MethodCallHandler {
         val reachabilityInfo: ReachabilityDetails? = sdk.isReachable()
         launch(Dispatchers.Main) {
           if (reachabilityInfo == null) {
-            val failure = mapOf("status" to "-1", "detail" to "Unable to decode reachability result")
+            val failure = mapOf("status" to "-1", "detail" to "Unable to decode reachability result.")
             val jsonData = Json.encodeToString(failure)
             result.error("ReachabilityError", jsonData, "Reachability null error")
           } else {
@@ -218,13 +212,14 @@ class TruSdkFlutterPlugin: FlutterPlugin, MethodCallHandler {
           }
         }
       } catch (e: Exception) {
-        launch { Dispatchers.Main }
-        try {
-          val jsonData = Json.encodeToString(e)
-          result.success((jsonData))
-        } catch (e: Exception){
-          launch(Dispatchers.Main) {
-            result.error("Exception", "Received an exception ${e.localizedMessage}", e)
+        launch (Dispatchers.Main) {
+          try {
+            val jsonData = Json.encodeToString(e)
+            result.success((jsonData))
+          } catch (e: Exception){
+            launch(Dispatchers.Main) {
+              result.error("Exception", "Received an exception ${e.localizedMessage}", e)
+            }
           }
         }
       }
@@ -235,15 +230,26 @@ class TruSdkFlutterPlugin: FlutterPlugin, MethodCallHandler {
     CoroutineScope(Dispatchers.IO).launch {
       try {
         val reachabilityInfo: ReachabilityDetails? = sdk.isReachable(dataResidency)
-
-        val details = reachabilityInfo?.toJsonString()
-
         launch(Dispatchers.Main) {
-          result.success(details)
+          if (reachabilityInfo == null) {
+            val failure = mapOf("status" to "-1", "detail" to "Unable to decode reachability result.")
+            val jsonData = Json.encodeToString(failure)
+            result.error("ReachabilityError", jsonData, "Reachability null error")
+          } else {
+            val details = reachabilityInfo?.toJsonString()
+            result.success(details)
+          }
         }
       } catch (e: Exception) {
-        launch(Dispatchers.Main) {
-          result.error("Exception", "Received an exception ${e.localizedMessage}", e)
+        launch (Dispatchers.Main) {
+          try {
+            val jsonData = Json.encodeToString(e)
+            result.success((jsonData))
+          } catch (e: Exception){
+            launch(Dispatchers.Main) {
+              result.error("Exception", "Received an exception ${e.localizedMessage}", e)
+            }
+          }
         }
       }
     }

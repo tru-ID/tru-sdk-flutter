@@ -75,10 +75,12 @@ public class SwiftTruSdkFlutterPlugin: NSObject, FlutterPlugin {
         let sdk = TruSDK()
         sdk.checkUrlWithResponseBody(url: URL(string: args)!) { error, body in
             if let error = error {
+                print("checkUrlWithResponseBody error: [\(error)]")
                 result(FlutterError(code: "iOSError",
-                                    message: error.localizedDescription,
-                                    details: error))
+                                message: "NetworkError",
+                                details: nil))
             } else {
+                print("checkUrlWithResponseBody body: [\(body)]")
                 if let body = body {
                     if body["code"] != nil && body["check_id"] != nil {
                         //return a dictionary with the successful response

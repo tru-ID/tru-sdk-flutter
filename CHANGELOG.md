@@ -1,6 +1,14 @@
 # tru_sdk_flutter
 
 # Change Log
+# Version 0.1.6
+
+_2022-07-24_
+
+**Bug Fixes**
+
+- iOS: checkUrlWithResponseBody error handling
+
 # Version 0.1.5
 
 _2022-07-21_

@@ -4,14 +4,14 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'tru_sdk_flutter'
-  s.version          = '0.1.5'
+  s.version          = '0.1.6'
   s.summary          = 'tru.ID Flutter Plugin.'
   s.description      = <<-DESC
 A new flutter plugin project.
                        DESC
   s.homepage         = 'https://github.com/tru-id/tru-sdk-flutter'
   s.license          = { :file => '../LICENSE' }
-  s.author           = { 'author' => 'Eric@tru.id' }
+  s.author           = { 'author' => 'eric@tru.id' }
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
