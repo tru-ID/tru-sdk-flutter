@@ -36,190 +36,34 @@ public class SwiftTruSdkFlutterPlugin: NSObject, FlutterPlugin {
         //This method is called on the Main Thread
         switch call.method {
         case "getPlatformVersion" : result("iOS " + UIDevice.current.systemVersion)
-        case "check" : check(arguments: call.arguments, result: result)
-        case "checkUrlWithResponseBody" : checkUrlWithResponseBody(arguments: call.arguments, result: result)
-        case "checkWithTrace": checkWithTrace(arguments: call.arguments, result: result)
-        case "isReachable": isReachable(result: result)
-        case "isReachableWithDataResidency": isReachableWithDataResidency(arguments: call.arguments, result: result)
+        case "openWithDataCellular" : openWithDataCellular(arguments: call.arguments, result: result)
         default:
             result(FlutterMethodNotImplemented)
         }
     }
 
-    func check(arguments: Any?, result: @escaping FlutterResult) {
-        guard let args = arguments as? String else {
+    func openWithDataCellular(arguments: Any?, result: @escaping FlutterResult) {
+        guard let args = arguments as? Dictionary<String, Any> else {
+            result(FlutterError(code: "iOSError",
+                                message: "Invalid parameters",
+                                details: nil))
+            return
+        }
+        guard let urlString = args["url"] as? String, let url = URL(string: urlString) else {
             result(FlutterError(code: "iOSError",
                                 message: "No url parameter",
                                 details: nil))
             return
         }
-
-        let sdk = TruSDK()
-        sdk.check(url: URL(string: args)!) { error in
-            if let error = error {
-                result("iOS check() - Error [\(error)]")
-            } else {
-                result("iOS check() - Success [\(args)]")
-            }
-        }
-    }
-
-    func checkUrlWithResponseBody(arguments: Any?, result: @escaping FlutterResult) {
-        guard let args = arguments as? String else {
+        guard let debug = args["debug"] as? Bool else {
             result(FlutterError(code: "iOSError",
-                                message: "No url parameter",
+                                message: "No debug parameter",
                                 details: nil))
             return
         }
-
         let sdk = TruSDK()
-        sdk.checkUrlWithResponseBody(url: URL(string: args)!) { error, body in
-            if let error = error {
-                print("checkUrlWithResponseBody error: [\(error)]")
-                result(FlutterError(code: "iOSError",
-                                message: "NetworkError",
-                                details: nil))
-            } else {
-                print("checkUrlWithResponseBody body: [\(body)]")
-                if let body = body {
-                    if body["code"] != nil && body["check_id"] != nil {
-                        //return a dictionary with the successful response
-                    
-                        let success = [
-                            "code": body["code"],
-                            "check_id": body["check_id"],
-                            "reference_id": body["reference_id"] ?? ""
-                        ]
-                        result(success)
-                    } else if body["error"] != nil && body["error_description"] != nil {
-                        //return a dictionary with the error response
-                        let failure = [
-                            "error":body["error"],
-                            "error_description":body["error_description"],
-                            "check_id": body["check_id"],
-                            "reference_id": body["reference_id"]  
-                        ]
-                        result(failure)
-                    } else {
-                        result(FlutterError(code: "iOSError",
-                                            message: "There is an issue with response body. Unable to serialise success or error from the dictionary",
-                                            details: error))
-                    }
-                } else {
-                    result(nil) //Since v0.1 does not return a body, we are returning nil
-                }
-            }
-        }
-    }
-
-    func checkWithTrace(arguments: Any?, result: @escaping FlutterResult) {
-        guard let args = arguments as? String else {
-            result(FlutterError(code: "iOSError",
-                                message: "No url parameter",
-                                details: nil))
-            return
-        }
-
-        let sdk = TruSDK()
-        sdk.checkWithTrace(url: URL(string: args)!) { error, traceInfo in
-            if let error = error {
-                result(FlutterError(code: "iOSError",
-                                    message: error.localizedDescription,
-                                    details: error))
-            } else {
-                if let body = traceInfo?.responseBody {
-                    if body["code"] != nil && body["check_id"] != nil {
-                        //return a dictionary with the successful response
-                        let success = [
-                            "code": body["code"],
-                            "check_id": body["check_id"],
-                            "reference_id": body["reference_id"],
-                            "trace": traceInfo?.trace
-                        ]
-                        result(success)
-                        print("Plugin", "checkWithTrace Success")
-                    } else if body["error"] != nil && body["error_description"] != nil {
-                        //return a dictionary with the error response
-                        let failure = [
-                            "error":body["error"],
-                            "error_description":body["error_description"],
-                            "check_id": body["check_id"],
-                            "reference_id": body["reference_id"],
-                            "trace": traceInfo?.trace
-                        ]
-                        result(failure)
-                        print("Plugin", "checkWithTrace Failure")
-                    } else {
-                        result(FlutterError(code: "iOSError",
-                                            message: "There is an issue with response body. Unable to serialise success or error from the dictionary",
-                                            details: error))
-                    }
-                } else {
-                    let responseWithTrace = [
-                      "trace": traceInfo?.trace,
-                    ]
-                    result(responseWithTrace) //Since v0.1 does not return a body, we are returning just the trace
-                    print("Plugin", "checkWithTrace Trace")
-                }
-            }
-        }
-    }
-
-    // TODO: Return serialised ReachabilityDetails
-    func isReachable(result: @escaping FlutterResult) {
-        print("isReachable called")
-        let sdk = TruSDK()
-        sdk.isReachable { reachableResult in
-            switch reachableResult {
-            case .success(let details):
-                do {
-                    let jsonData = try JSONEncoder().encode(details)
-                    let jsonString = String(data: jsonData, encoding: .utf8)!
-                     result(jsonString)
-                } catch  {
-                    result("Unable to decode reachability result")
-                }
-            case .failure(let error): 
-                do {
-                    let jsonData = try JSONEncoder().encode(error)
-                    let jsonString = String(data: jsonData, encoding: .utf8)!
-                     result(jsonString)
-                } catch  {
-                    result("iOS isReachable() - \(error)")
-                }
-            }
-        }
-    }
-
-    func isReachableWithDataResidency(arguments: Any?, result: @escaping FlutterResult) {
-        guard let dataResidency = arguments as? String else {
-            result(FlutterError(code: "iOSError",
-                                message: "No dataResidency parameter",
-                                details: nil))
-            return
-        }
-        print("isReachableWithDataResidency called")
-        let sdk = TruSDK()
-        
-        sdk.isReachable(dataResidency: dataResidency) { reachableResult in
-            switch reachableResult {
-            case .success(let details):
-                do {
-                    let jsonData = try JSONEncoder().encode(details)
-                    let jsonString = String(data: jsonData, encoding: .utf8)!
-                        result(jsonString)
-                } catch  {
-                    result("Unable to decode reachability result")
-                }
-            case .failure(let error):                 
-                do {
-                    let jsonData = try JSONEncoder().encode(error)
-                    let jsonString = String(data: jsonData, encoding: .utf8)!
-                    result(jsonString)
-                } catch  {
-                    result("iOS isReachable() - \(error)")
-                }
-            }
+        sdk.openWithDataCellular(url:  url, debug: debug) { resp in
+            result(resp)
         }
     }
 
