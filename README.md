@@ -96,15 +96,15 @@ import 'package:tru_sdk_flutter/tru_sdk_flutter.dart';
       if (result.containsKey("error")) {
          // error
       } else if (reach.containsKey("http_status")) {
-         if (reach["http_status"] == 200) {
+         if (result["http_status"] == 200) {
           Map<Object?, Object?> body = result["response_body"] as Map<Object?, Object?>;
             if (body["code"] != null) {
                // send code, check_id and reference_id to back-end 
                // to trigger a PATCH /checks/{check_id}
             }    
-         } else if (reach["status"] == 400) {
+         } else if (result["status"] == 400) {
           // MNO not supported
-         } else if (reach["status"] == 412) {
+         } else if (result["status"] == 412) {
             // Not a mobible IP
          } else {
             // No Data Connectivity - Ask the end-user to turn on Mobile Data
