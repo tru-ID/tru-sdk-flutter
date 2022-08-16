@@ -57,7 +57,7 @@ To add the package `tru_sdk_flutter` to your app project:
 
 ## Usage
 
-* Is the device eligible for tru.ID silent authentication?
+* Is the [device eligible](https://developer.tru.id/docs/reference/utils#tag/coverage/operation/get-public-coverage-by-device-ip) for tru.ID silent authentication?
 
 ```dart
 import 'package:tru_sdk_flutter/tru_sdk_flutter.dart';
