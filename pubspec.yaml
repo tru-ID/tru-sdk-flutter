@@ -1,6 +1,6 @@
 name: tru_sdk_flutter
 description: tru.ID flutter plugin.
-version: 0.1.6
+version: 1.0.0-preview
 homepage: https://github.com/tru-ID/tru-sdk-flutter
 
 environment:

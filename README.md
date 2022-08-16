@@ -1,13 +1,35 @@
 # tru.ID SDK For Flutter
+[![License][license-image]][license-url]
 
-## Getting Started
+The only purpose of the SDK is to force the data cellular connectivity prior to call a public URL, and will return the following JSON response
 
-Before you begin, you will need to:
+* **Success**
+When the data connectivity has been achieved and a response has been received from the url endpoint
+```
+{
+"http_status": string, // HTTP status related to the url
+"response_body" : { // optional depending on the HTTP status
+           ... // the response body of the opened url 
+           ... // see API doc for /device_ip and /redirect
+                },
+"debug" : {
+    "device_info": string, 
+    "url_trace" : string
+          }
+}
+```
 
-- For iOS: Xcode 12+ required
-- For Android: Android Studio version 3.0 or later
-- A mobile phone with mobile data connection.
-- Install [Flutter](https://docs.flutter.dev/get-started/install/macos#deploy-to-ios-devices)
+* **Error** 
+When data connectivity is not available and/or an internal SDK error occurred
+
+```
+{
+"error" : string,
+"error_description": string
+}
+```
+Potential error codes: `sdk_no_data_connectivity`, `sdk_connection_error`, `sdk_redirect_error`, `sdk_error`.
+
 
 ## Installation
 
@@ -16,7 +38,7 @@ To add the package `tru_sdk_flutter` to your app project:
 1. Depend on it. Open the `pubspec.yaml` file located inside the app folder and add the following under the dependencies heading:
 
 ```yaml
-	`tru_sdk_flutter: ^0.1.6`
+	`tru_sdk_flutter: ^x.y.z`
 ```
 
 2. Install it
@@ -29,71 +51,72 @@ To add the package `tru_sdk_flutter` to your app project:
 
 ## Compatibility
 
-For Android, this SDK requires a minimum API level of **21** (Android 5).
+- [Android](../tru-sdk-android#compatibility)
+- [iOS](../tru-sdk-ios#compatibility)
+
 
 ## Usage
+
+* Is the device eligible for tru.ID silent authentication?
 
 ```dart
 import 'package:tru_sdk_flutter/tru_sdk_flutter.dart';
 
 // ...
-TruSdkFlutter sdk = TruSdkFlutter();
+   TruSdkFlutter sdk = TruSdkFlutter();
 
-await sdk.checkUrlWithResponseBody(checkUrl);
+   Map<Object?, Object?> reach = await sdk.openWithDataCellular(
+      "https://eu.api.tru.id/public/coverage/v0.1/device_ip", false);
+   if (reach.containsKey("error")) {
+      // Network connectivity error
+   } else if (reach.containsKey("http_status")) {
+      
+      if (reach["http_status"] == 200) {
+         // device is eligible for tru.ID
+      } else if (reach["status"] == 400) {
+         // MNO not supported
+      } else if (reach["status"] == 412) {
+         // Not a mobible IP
+      } else {
+         // No Data Connectivity - Ask the end-user to turn on Mobile Data
+      }
+
+   }
+
+```
+
+* How to open a check URL return by the [PhoneCheck API](https://developer.tru.id/docs/phone-check) or [SubscriberCheck API](https://developer.tru.id/docs/subscriber-check)
+```dart
+import 'package:tru_sdk_flutter/tru_sdk_flutter.dart';
+
+// ...
+   TruSdkFlutter sdk = TruSdkFlutter();
+
+   Map<Object?, Object?> result = await sdk.openWithDataCellular(checkUrl, false);
+      if (result.containsKey("error")) {
+         // error
+      } else if (reach.containsKey("http_status")) {
+         if (reach["http_status"] == 200) {
+          Map<Object?, Object?> body = result["response_body"] as Map<Object?, Object?>;
+            if (body["code"] != null) {
+               // send code, check_id and reference_id to back-end 
+               // to trigger a PATCH /checks/{check_id}
+            }    
+         } else if (reach["status"] == 400) {
+          // MNO not supported
+         } else if (reach["status"] == 412) {
+            // Not a mobible IP
+         } else {
+            // No Data Connectivity - Ask the end-user to turn on Mobile Data
+         }
+   }
+
 ```
 
 ## Example Demo
 
-The SDK contains an embedded example to make building and testing the SDK bridge easier.
+There's an embedded example demo is located in the `example` directory, see [README](./example/README.md)
 
-The example project is located in the `example` directory.
-
-This SDK uses the **tru.ID** dev server as the example server. To get setup:
-
-Create a [tru.ID account](https://developer.tru.id/signup).
-
-Install the tru.ID CLI via:
-
-```bash
-npm i -g @tru_id/cli
-```
-
-Set up the CLI with the **tru.ID** credentials which can be found within the tru.ID [console](https://developer.tru.id/console).
-
-Install the **tru.ID** CLI [development server plugin](https://github.com/tru-ID/cli-plugin-dev-server).
-
-Create a new **tru.ID** project within the root directory via:
-
-```bash
-tru projects:create flutter-sdk-server --project-dir .
-```
-
-Run the development server, pointing it to the directory containing the newly created project configuration. This will also open up a localtunnel to your development server, making it publicly accessible to the Internet so that your mobile phone can access it when only connected to mobile data.
-
-```bash
-tru server -t --project-dir .
-```
-
-In `example/lib/main.dart` , replace `base_url` with your development server URL.
-
-It may be a good idea to work on the native Android or iOS example projects in separate windows/IDEs. Android Studio will provide a banner suggesting this.
-
-Android Example Project\
-tru-sdk-flutter/example/android
-
-iOS Example\
-tru-sdk-flutter/example/ios
-
-Don't forget to make sure Cocoapods installed on your machine and install pods to example.
-```
-cd ios
-pod install
-```
-
-
-## Troubleshooting
-
-[Module was compiled with an incompatible version of Kotlin. The binary version of its metadata is 1.5.1, expected version is 1.1.15.](https://github.com/flutter/flutter/issues/83834)
 
 ## Meta
 

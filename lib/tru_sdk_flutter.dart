@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 import 'dart:async';
-import 'dart:collection';
+import 'dart:ffi';
 import 'package:flutter/services.dart';
 
 class TruSdkFlutter {
@@ -33,121 +33,13 @@ class TruSdkFlutter {
     return version;
   }
 
-  Future<String?> check(String url) async {
+  Future<Map<Object?, Object?>> openWithDataCellular(
+      String url, bool debug) async {
     try {
-      return await _channel.invokeMethod('check', url);
+      return await _channel
+          .invokeMethod('openWithDataCellular', {'url': url, 'debug': debug});
     } on PlatformException catch (e) {
-      return e.message;
+      return {'error': 'sdk_error', 'error_description': 'Platform exception'};
     }
   }
-
-  Future<Map<Object?, Object?>?> checkWithTrace(String url) async {
-    try {
-      return await _channel.invokeMethod('checkWithTrace', url);
-    } on PlatformException catch (e) {
-      throw Exception('Failed execute platform request');
-    }
-  }
-
-  Future<Map<Object?, Object?>?> checkUrlWithResponseBody(String url) async {
-    try {
-      return await _channel.invokeMethod('checkUrlWithResponseBody', url);
-    } on PlatformException catch (e) {
-      throw Exception('Failed execute platform request');
-    }
-  }
-
-  Future<String?> isReachable() async {
-    try {
-      return await _channel.invokeMethod('isReachable');
-    } on PlatformException catch (e) {
-      return e.message;
-    }
-  }
-
-  Future<String?> isReachableWithDataResidency(String? dataResidency) async {
-    try {
-      return await _channel.invokeMethod(
-          'isReachableWithDataResidency', dataResidency);
-    } on PlatformException catch (e) {
-      return e.message;
-    }
-  }
-}
-
-class ReachabilityDetails {
-  String countryCode = "";
-  String networkId = "";
-  String networkName = "";
-  List<Product>? products = [];
-  ReachabilityError? error;
-
-  ReachabilityDetails(
-      {required this.countryCode,
-      required this.networkId,
-      required this.networkName,
-      required this.products,
-      required this.error});
-
-  factory ReachabilityDetails.fromJson(Map<String?, dynamic> jsonBody) {
-    var productsJson = jsonBody['products'];
-
-    Iterable l = jsonBody['products'];
-    List<Product> products = List<Product>.from(
-        l.map((productsJson) => Product.fromJson(productsJson)));
-
-    return ReachabilityDetails(
-        countryCode: jsonBody['country_code'],
-        networkId: jsonBody['network_id'],
-        networkName: jsonBody['network_name'],
-        products: products,
-        error: jsonBody['error']);
-  }
-}
-
-class Product {
-  String productId = "";
-  String productName = "";
-
-  Product({required this.productId, required this.productName});
-
-  factory Product.fromJson(Map<String?, dynamic> json) {
-    return Product(
-        productId: json['product_id'], productName: json['product_name']);
-  }
-}
-
-class ReachabilityError {
-  String? type;
-  String? title;
-  int? status;
-  String? detail;
-
-  ReachabilityError({this.type, this.title, this.status, this.detail});
-
-  factory ReachabilityError.fromJson(Map<String?, dynamic> json) {
-    return ReachabilityError(
-        type: json['type'],
-        title: json['title'],
-        status: json['status'],
-        detail: json['detail']);
-  }
-}
-
-class TraceInfo {
-  String trace = "";
-  DebugInfo debugInfo = DebugInfo();
-}
-
-class DebugInfo {
-  Map<String, String> bufferMap = {};
-}
-
-class TraceCollector {
-  String trace = "";
-  bool isTraceEnabled = false;
-  DebugInfo debugInfo = DebugInfo();
-  bool isDebugInfoCollectionEnabled = false;
-  bool isConsoleLogsEnabled = false;
-  TraceInfo traceInfo = TraceInfo();
 }

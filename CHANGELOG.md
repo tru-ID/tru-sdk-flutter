@@ -1,6 +1,12 @@
 # tru_sdk_flutter
 
 # Change Log
+## Version 1.0.0-preview
+_2022-08-11_
+
+**Changes**
+- Breaking changes from 0.x.x, see README 
+
 # Version 0.1.6
 
 _2022-07-24_

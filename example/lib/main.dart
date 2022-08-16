@@ -33,7 +33,7 @@ import 'package:tru_sdk_flutter/tru_sdk_flutter.dart';
 import 'src/http/mock_client.dart';
 
 // Set up a local tunnel base url.
-final String baseURL = "YOUR_LOCAL_TUNNEL_URL";
+final String baseURL = "https://50935cefba93.eu.ngrok.io";
 
 void main() {
   runApp(PhoneCheckApp());
@@ -147,6 +147,7 @@ class _PhoneCheckAppState extends State<PhoneCheckHome> {
     return TextFormField(
       //autofocus: true,
       initialValue: (phoneNumber == null) ? null : phoneNumber,
+      keyboardType: TextInputType.phone,
       textInputAction: TextInputAction.next,
       validator: (value) {
         if (value!.isEmpty) {
@@ -219,7 +220,11 @@ class _PhoneCheckAppState extends State<PhoneCheckHome> {
 
   Widget verifyButton() {
     return TextButton(
-      child: const Text('Verify'),
+      child: const Text('Verify my phone number'),
+      style: TextButton.styleFrom(
+        primary: Colors.white,
+        backgroundColor: Colors.blue,
+      ),
       onPressed: () {
         // Validate the form by getting the FormState from the GlobalKey
         // and calling validate() on it.
@@ -242,75 +247,75 @@ class _PhoneCheckAppState extends State<PhoneCheckHome> {
     print("[Reachability] - Start");
     TruSdkFlutter sdk = TruSdkFlutter();
     try {
-      String? reach = await sdk.isReachable();
-      print("isReachable = ${reach}");
-      if (reach != null) {
-        Map<String, dynamic> jsonReach = jsonDecode(reach);
-        if (jsonReach.containsKey("status")) {
-          //if status exists, there is an error
-          if (jsonReach["status"] == "400" || jsonReach["status"] == "412") {
-            // We should not be proceeding with the phoneCheck and display an error to the user
-            throw Exception('Either MNO Not Supported or Not a Mobile IP');
-          } else {
-            // No Data Connectivity - Ask the end-user to turn on Mobile Data
-            throw Exception(
-                'Status = ${jsonReach["status"]} - ${jsonReach["detail"]}');
-          }
+      Map<Object?, Object?> reach = await sdk.openWithDataCellular(
+          "https://eu.api.tru.id/public/coverage/v0.1/device_ip", false);
+      print("isReachable = $reach");
+
+      if (reach.containsKey("error")) {
+        throw Exception(
+            'Status = ${reach["error"]} - ${reach["error_description"]}');
+      } else if (reach.containsKey("http_status") &&
+          reach["http_status"] != 200) {
+        print("isReachable non-200 OK");
+        //if status exists, there is an error
+        if (reach["status"] == 400 || reach["status"] == 412) {
+          // We should not be proceeding with the phoneCheck and display an error to the user
+          throw Exception('Either MNO Not Supported or Not a Mobile IP');
         } else {
-          //everything is fine
-          print("[PhoneCheck] - Creating phone check");
-          final response = await http.post(
-            Uri.parse('$baseURL/v0.2/phone-check'),
-            headers: <String, String>{
-              'content-type': 'application/json; charset=UTF-8',
-            },
-            body: jsonEncode(<String, String>{
-              'phone_number': phoneNumber,
-            }),
-          );
+          // No Data Connectivity - Ask the end-user to turn on Mobile Data
+          throw Exception(
+              'Status = ${reach["status"]} - ${reach["response_body"]}');
+        }
+      } else if (reach.containsKey("http_status") ||
+          reach["http_status"] == 200) {
+        //everything is fine
+        print("[PhoneCheck] - Creating phone check");
+        final response = await http.post(
+          Uri.parse('$baseURL/v0.2/phone-check'),
+          headers: <String, String>{
+            'content-type': 'application/json; charset=UTF-8',
+          },
+          body: jsonEncode(<String, String>{
+            'phone_number': phoneNumber,
+          }),
+        );
 
-          print("[PhoneCheck] - Received response");
-          if (response.statusCode == 200) {
-            PhoneCheck checkDetails =
-                PhoneCheck.fromJson(jsonDecode(response.body));
-            try {
-              Map<Object?, Object?>? result =
-                  await sdk.checkUrlWithResponseBody(checkDetails.url);
-              print("CheckWithUrlResponseBody Results -> $result");
+        print("[PhoneCheck] - Received response");
+        if (response.statusCode == 200) {
+          PhoneCheck checkDetails =
+              PhoneCheck.fromJson(jsonDecode(response.body));
+          Map<Object?, Object?> result =
+              await sdk.openWithDataCellular(checkDetails.url, false);
+          print("openWithDataCellular Results -> $result");
+          if (result.containsKey("error")) {
+            print(result);
+            throw Exception('result returns error');
+          } else if (result.containsKey("http_status") &&
+              result["http_status"] == 200) {
+            Map<Object?, Object?> body =
+                result["response_body"] as Map<Object?, Object?>;
+            if (body["code"] != null) {
+              try {
+                if (body["reference_id"] == null) body["reference_id"] = "";
 
-              // v0.2 Only
-              if (result != null) {
-                if (result["code"] != null) {
-                  try {
-                    if (result['reference_id'] == null) {
-                      result['reference_id'] = "";
-                    }
-                    return exchangeCode(
-                        result['check_id'] as String,
-                        result['code'] as String,
-                        result['reference_id'] as String);
-                  } catch (error) {
-                    print(error);
-                    throw Exception('result returns error');
-                  }
-                } else if (result.isEmpty) {
-                  throw Exception('result from checkWithUrl is empty');
-                } else {
-                  throw Exception('result from checkWithUrl is with Error');
-                }
-              } else {
-                throw Exception('result from checkWithUrl is null');
+                return exchangeCode(body['check_id'] as String,
+                    body['code'] as String, body['reference_id'] as String);
+              } catch (error) {
+                print(error);
+                throw Exception('result returns error');
               }
-            } on PlatformException {
-              throw Exception('Failed execute platform request');
+            } else {
+              String error = body["error"] as String;
+              throw Exception('openWithDataCellular error ' + error);
             }
-          } else {
-            throw Exception('Failed to create phone check');
-          }
-        } //else for reachability success scenario
+          } else
+            throw Exception('openWithDataCellular unexpected status');
+        } else {
+          throw Exception('Failed to create phone check');
+        }
       } else {
-        // No Data Connectivity - Ask the end-user to turn on Mobile Data
-        throw Exception('Failed to acquire Reachability Details');
+        print("isReachable parsing error");
+        throw Exception('reachability failed');
       }
     } on PlatformException catch (e) {
       print("isReachable Error: ${e.toString()}");

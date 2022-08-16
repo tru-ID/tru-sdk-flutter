@@ -25,7 +25,6 @@ package id.tru.sdk.flutter.tru_sdk_flutter
 import android.content.Context
 import android.util.Log
 import androidx.annotation.NonNull
-import id.tru.sdk.ReachabilityDetails
 import id.tru.sdk.TruSDK
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
@@ -36,222 +35,86 @@ import io.flutter.plugin.common.MethodChannel.Result
 import kotlinx.coroutines.CoroutineScope
 import java.lang.Exception
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.encodeToString
-import java.io.Serializable
+import org.json.JSONArray
+import org.json.JSONObject
 import java.net.URL
 
-/** TruSdkFlutterPlugin */
-class TruSdkFlutterPlugin: FlutterPlugin, MethodCallHandler {
-  /// The MethodChannel that will the communication between Flutter and native Android
-  ///
-  /// This local reference serves to register the plugin with the Flutter Engine and unregister it
-  /// when the Flutter Engine is detached from the Activity
-  private lateinit var channel : MethodChannel
-  private lateinit var context: Context
-  private lateinit var sdk: TruSDK
+class TruSdkFlutterPlugin : FlutterPlugin, MethodCallHandler {
+    private lateinit var channel: MethodChannel
+    private lateinit var context: Context
+    private lateinit var sdk: TruSDK
 
-  override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-    context = flutterPluginBinding.applicationContext
-    sdk = TruSDK.initializeSdk(context)
-    channel = MethodChannel(flutterPluginBinding.binaryMessenger, "id.tru.sdk/flutter")
-    channel.setMethodCallHandler(this)
-  }
-
-  override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
-    Log.d("FlutterPlugin", "native method called")
-    try {
-      when (call.method) {
-        "getPlatformVersion" -> {
-          result.success("Android ${android.os.Build.VERSION.RELEASE}")
-        }
-        "check" -> {
-          check(call.arguments as String, result)
-        }
-        "checkUrlWithResponseBody" -> {
-          checkUrlWithResponseBody(call.arguments as String, result)
-        }
-        "checkWithTrace" -> {
-          checkWithTrace(call.arguments as String, result)
-        }
-        "isReachable" -> {
-          isReachable(result)
-        }
-        "isReachableWithDataResidency" -> {
-          isReachableWithDataResidency(call.arguments as String, result)
-        }
-        else -> {
-          result.notImplemented()
-        }
-      }
-    } catch (e: Exception) {
-      result.error("Exception", "Received an exception ${e.localizedMessage}", e)
+    override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
+        context = flutterPluginBinding.applicationContext
+        sdk = TruSDK.initializeSdk(context)
+        channel = MethodChannel(flutterPluginBinding.binaryMessenger, "id.tru.sdk/flutter")
+        channel.setMethodCallHandler(this)
     }
-  }
 
-  override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
-    channel.setMethodCallHandler(null)
-  }
-
-  fun check(url: String, result: Result) {
-    CoroutineScope(Dispatchers.IO).launch {
-      try {
-        val isRequestOnMobileNetwork = sdk.check(url)
-        launch(Dispatchers.Main) {
-          print("Calling results on main thread")
-          result.success("$isRequestOnMobileNetwork")
+    override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
+        Log.d("FlutterPlugin", "native method called")
+        try {
+            when (call.method) {
+                "getPlatformVersion" -> {
+                    result.success("Android ${android.os.Build.VERSION.RELEASE}")
+                }
+                "openWithDataCellular" -> {
+                    openWithDataCellular(call.arguments as Map<String, Any>, result)
+                }
+                else -> {
+                    result.notImplemented()
+                }
+            }
+        } catch (e: Exception) {
+            result.error("Exception", "Received an exception ${e.localizedMessage}", e)
         }
-      } catch (e: Exception) {
-        launch(Dispatchers.Main) {
-          result.error("Exception", "Received an exception ${e.localizedMessage}", e)
-        }
-      }
     }
-  }
 
-  fun checkUrlWithResponseBody(url: String, result: Result) {
-    CoroutineScope(Dispatchers.IO).launch {
-      try {
-        val body = sdk.checkUrlWithResponseBody(url)
-        if (body != null) {
-          if (body.has("code") && body.has("check_id")) {
-            val success = mapOf("code" to body.get("code"), "check_id" to body.get("check_id"), "reference_id" to body.get("reference_id") )
-            launch(Dispatchers.Main) {
-              result.success(success)
-            }
-
-          } else if (body.has("error") && body.has("error_description")) {
-            val failure = mapOf("error" to body.get("error"), "error_description" to body.get("error_description"), "check_id" to body.get("check_id"), "reference_id" to body.get("reference_id"))
-            launch(Dispatchers.Main) {
-              result.success(failure)
-            }
-          } else {
-            launch(Dispatchers.Main) {
-              val failure = mapOf("status" to "-1", "detail" to "Unable to decode response body.")
-              val jsonData = Json.encodeToString(failure)
-              result.error("Exception", jsonData, "Unable to decode response body.")
-            }
-          }
-        } else {
-          val emptyMap = emptyMap<String, Any>()
-          result.success(emptyMap) //Since v0.1 does not return a body, we are returning an empty dictionary
-        }
-      } catch (e: Exception) {
-        launch(Dispatchers.Main) {
-          result.error("Exception", "Received an exception ${e.localizedMessage}", e)
-        }
-      }
-
+    override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
+        channel.setMethodCallHandler(null)
     }
-  }
 
+    fun openWithDataCellular(args: Map<String, Any>, result: Result) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                var debug: Boolean = false
+                if (!args.containsKey("url")) {
+                    val failure =
+                        mapOf("error" to "sdk_error", "error_description" to "invalid url")
+                    result.success(failure)
+                }
+                if (args.containsKey("debug")) {
+                    debug = args["debug"] as Boolean
+                }
 
-  fun checkWithTrace(url: String, result: Result) {
-    CoroutineScope(Dispatchers.IO).launch {
-      try {
-        val traceInfo = sdk.checkWithTrace(URL(url))
-        val body = traceInfo.responseBody
-        if (body != null) {
-          if (body.has("code") && body.has("check_id")) {
-            val success = mapOf(
-              "code" to body.get("code"),
-              "check_id" to body.get("check_id"),
-              "reference_id" to body.get("reference_id"),
-              "trace" to traceInfo.trace)
-            launch(Dispatchers.Main) {
-              result.success(success)
+                val body = sdk.openWithDataCellular(URL(args["url"] as String?), debug)
+                var map: Map<String, *> = body.toMap()
+                launch(Dispatchers.Main) {
+                    result.success(map)
+                }
+            } catch (e: Exception) {
+                launch(Dispatchers.Main) {
+                    val failure = mapOf(
+                        "error" to "sdk_error",
+                        "error_description" to "Internal error: ${e.localizedMessage}"
+                    )
+                    result.success(failure)
+                }
             }
-            println("checkWithTrace Success")
-
-          } else if (body.has("error") && body.has("error_description")) {
-            val failure = mapOf(
-              "error" to body.get("error"),
-              "error_description" to body.get("error_description"),
-              "check_id" to body.get("check_id"),
-              "reference_id" to body.get("reference_id"),
-              "trace" to traceInfo.trace)
-            launch(Dispatchers.Main) {
-              result.success(failure)
-              println("checkWithTrace Failure")
-            }
-          } else {
-            launch(Dispatchers.Main) {
-              val failure = mapOf("status" to "-1", "detail" to "Unable to decode response body.")
-              val jsonData = Json.encodeToString(failure)
-              result.error("Exception", jsonData, "Unable to decode response body.")
-           }
-          }
-        } else {
-          val checkWithTrace = mapOf("trace" to traceInfo.trace)
-          result.success(checkWithTrace) //Since v0.1 does not return a body, we are returning an empty dictionary
-          println("checkWithTrace no body")
         }
-      } catch (e: Exception) {
-        launch(Dispatchers.Main) {
-          result.error("Exception", "Received an exception ${e.localizedMessage}", e)
-        }
-      }
-
     }
-  }
 
-  fun isReachable(result: Result) {
-    CoroutineScope(Dispatchers.IO).launch {
-      try {
-        val reachabilityInfo: ReachabilityDetails? = sdk.isReachable()
-        launch(Dispatchers.Main) {
-          if (reachabilityInfo == null) {
-            val failure = mapOf("status" to "-1", "detail" to "Unable to decode reachability result.")
-            val jsonData = Json.encodeToString(failure)
-            result.error("ReachabilityError", jsonData, "Reachability null error")
-          } else {
-            val details = reachabilityInfo?.toJsonString()
-            result.success(details)
-          }
-        }
-      } catch (e: Exception) {
-        launch (Dispatchers.Main) {
-          try {
-            val jsonData = Json.encodeToString(e)
-            result.success((jsonData))
-          } catch (e: Exception){
-            launch(Dispatchers.Main) {
-              result.error("Exception", "Received an exception ${e.localizedMessage}", e)
+    // convenient method to convert a JSON into a Map
+    fun JSONObject.toMap(): Map<String, *> = keys().asSequence().associateWith {
+        when (val value = this[it]) {
+            is JSONArray -> {
+                val map = (0 until value.length()).associate { Pair(it.toString(), value[it]) }
+                JSONObject(map).toMap().values.toList()
             }
-          }
+            is JSONObject -> value.toMap()
+            JSONObject.NULL -> null
+            else -> value
         }
-      }
     }
-  }
-
-  fun isReachableWithDataResidency(dataResidency: String, result: Result) {
-    CoroutineScope(Dispatchers.IO).launch {
-      try {
-        val reachabilityInfo: ReachabilityDetails? = sdk.isReachable(dataResidency)
-        launch(Dispatchers.Main) {
-          if (reachabilityInfo == null) {
-            val failure = mapOf("status" to "-1", "detail" to "Unable to decode reachability result.")
-            val jsonData = Json.encodeToString(failure)
-            result.error("ReachabilityError", jsonData, "Reachability null error")
-          } else {
-            val details = reachabilityInfo?.toJsonString()
-            result.success(details)
-          }
-        }
-      } catch (e: Exception) {
-        launch (Dispatchers.Main) {
-          try {
-            val jsonData = Json.encodeToString(e)
-            result.success((jsonData))
-          } catch (e: Exception){
-            launch(Dispatchers.Main) {
-              result.error("Exception", "Received an exception ${e.localizedMessage}", e)
-            }
-          }
-        }
-      }
-    }
-  }
 }
