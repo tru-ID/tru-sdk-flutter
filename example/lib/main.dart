@@ -20,8 +20,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import 'dart:async';
-import 'dart:collection';
 import 'dart:convert';
 import 'dart:core';
 import 'package:flutter/material.dart';
@@ -33,7 +31,7 @@ import 'package:tru_sdk_flutter/tru_sdk_flutter.dart';
 import 'src/http/mock_client.dart';
 
 // Set up a local tunnel base url.
-final String baseURL = "https://50935cefba93.eu.ngrok.io";
+final String baseURL = "https://24685ce0bafb.eu.ngrok.io";
 
 void main() {
   runApp(PhoneCheckApp());
@@ -247,7 +245,7 @@ class _PhoneCheckAppState extends State<PhoneCheckHome> {
     print("[Reachability] - Start");
     TruSdkFlutter sdk = TruSdkFlutter();
     try {
-      Map<Object?, Object?> reach = await sdk.openWithDataCellular(
+      Map reach = await sdk.openWithDataCellular(
           "https://eu.api.tru.id/public/coverage/v0.1/device_ip", false);
       print("isReachable = $reach");
 
@@ -268,6 +266,10 @@ class _PhoneCheckAppState extends State<PhoneCheckHome> {
         }
       } else if (reach.containsKey("http_status") ||
           reach["http_status"] == 200) {
+        Map body = reach["response_body"] as Map<dynamic, dynamic>;
+        Coverage cv = Coverage.fromJson(body);
+        print("body  ${cv.networkName}");
+        if (cv.products != null) print("product  ${cv.products![0]}");
         //everything is fine
         print("[PhoneCheck] - Creating phone check");
         final response = await http.post(
@@ -284,29 +286,28 @@ class _PhoneCheckAppState extends State<PhoneCheckHome> {
         if (response.statusCode == 200) {
           PhoneCheck checkDetails =
               PhoneCheck.fromJson(jsonDecode(response.body));
-          Map<Object?, Object?> result =
-              await sdk.openWithDataCellular(checkDetails.url, false);
+          Map result = await sdk.openWithDataCellular(checkDetails.url, false);
           print("openWithDataCellular Results -> $result");
           if (result.containsKey("error")) {
             print(result);
             throw Exception('result returns error');
           } else if (result.containsKey("http_status") &&
               result["http_status"] == 200) {
-            Map<Object?, Object?> body =
-                result["response_body"] as Map<Object?, Object?>;
+            Map body = result["response_body"] as Map<dynamic, dynamic>;
             if (body["code"] != null) {
+              CheckSuccessBody successBody = CheckSuccessBody.fromJson(body);
+              print('successBody $successBody');
               try {
-                if (body["reference_id"] == null) body["reference_id"] = "";
-
-                return exchangeCode(body['check_id'] as String,
-                    body['code'] as String, body['reference_id'] as String);
+                return exchangeCode(successBody.checkId, successBody.code,
+                    successBody.referenceId);
               } catch (error) {
                 print(error);
                 throw Exception('result returns error');
               }
             } else {
-              String error = body["error"] as String;
-              throw Exception('openWithDataCellular error ' + error);
+              CheckErrorBody errorBody = CheckErrorBody.fromJson(body);
+              print('errorBody $errorBody');
+              throw Exception('openWithDataCellular error $errorBody');
             }
           } else
             throw Exception('openWithDataCellular unexpected status');
@@ -342,11 +343,11 @@ Future<CheckStatus> fetchPhoneCheckResult(String checkID) async {
 
 //v0.2 Only
 Future<CheckStatus> exchangeCode(
-    String checkID, String code, String referenceID) async {
+    String checkID, String code, String? referenceID) async {
   var body = jsonEncode(<String, String>{
     'code': code,
     'check_id': checkID,
-    'reference_id': referenceID
+    'reference_id': (referenceID != null) ? referenceID : ""
   });
 
   final response = await http.post(
@@ -378,7 +379,7 @@ class PhoneCheck {
 
   PhoneCheck({required this.id, required this.url});
 
-  factory PhoneCheck.fromJson(Map<String, dynamic> json) {
+  factory PhoneCheck.fromJson(Map<dynamic, dynamic> json) {
     return PhoneCheck(
       id: json['check_id'],
       url: json['check_url'],
@@ -392,7 +393,7 @@ class CheckStatus {
 
   CheckStatus({required this.id, required this.match});
 
-  factory CheckStatus.fromJson(Map<String, dynamic> json) {
+  factory CheckStatus.fromJson(Map<dynamic, dynamic> json) {
     return CheckStatus(
       id: json['check_id'],
       match: json['match'] == null ? false : json['match'],

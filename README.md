@@ -73,6 +73,8 @@ import 'package:tru_sdk_flutter/tru_sdk_flutter.dart';
       
       if (reach["http_status"] == 200) {
          // device is eligible for tru.ID
+         Map body = reach["response_body"] as Map<dynamic, dynamic>;
+         Coverage cv = Coverage.fromJson(body);
       } else if (reach["status"] == 400) {
          // MNO not supported
       } else if (reach["status"] == 412) {
@@ -97,11 +99,15 @@ import 'package:tru_sdk_flutter/tru_sdk_flutter.dart';
          // error
       } else if (reach.containsKey("http_status")) {
          if (result["http_status"] == 200) {
-          Map<Object?, Object?> body = result["response_body"] as Map<Object?, Object?>;
+          Map body = result["response_body"] as Map<dynamic, dynamic>;
             if (body["code"] != null) {
+               CheckSuccessBody successBody = CheckSuccessBody.fromJson(body);
                // send code, check_id and reference_id to back-end 
                // to trigger a PATCH /checks/{check_id}
-            }    
+            } else {
+               CheckErrorBody errorBody = CheckErrorBody.fromJson(body);
+               // error
+            }   
          } else if (result["status"] == 400) {
           // MNO not supported
          } else if (result["status"] == 412) {
