@@ -26,6 +26,10 @@ When data connectivity is not available and/or an internal SDK error occurred
 {
 "error" : string,
 "error_description": string
+"debug": {
+    "device_info": string,
+    "url_trace" : string
+          }
 }
 ```
 Potential error codes: `sdk_no_data_connectivity`, `sdk_connection_error`, `sdk_redirect_error`, `sdk_error`.
@@ -78,7 +82,7 @@ import 'package:tru_sdk_flutter/tru_sdk_flutter.dart';
       } else if (reach["status"] == 400) {
          // MNO not supported
       } else if (reach["status"] == 412) {
-         // Not a mobible IP
+         // Not a mobile IP
       } else {
          // No Data Connectivity - Ask the end-user to turn on Mobile Data
       }

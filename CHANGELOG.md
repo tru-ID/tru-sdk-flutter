@@ -1,6 +1,13 @@
 # tru_sdk_flutter
-
 # Change Log
+## Version 1.0.0-preview
+_2022-09-26_
+
+**Bug Fixes**
+- ErrorResponse type amended
+- ReachabilityProduct type added
+
+
 ## Version 1.0.0-preview
 _2022-08-11_
 
