@@ -120,7 +120,7 @@ class _PhoneCheckAppState extends State<PhoneCheckHome> {
           if (snapshot.hasData) {
             _result = 'Match status: ${snapshot.data!.match}';
           } else if (snapshot.hasError) {
-            _result = '$snapshot.error';
+            _result = 'Error:${snapshot.error}';
           }
           return bodyForm();
         } else if (snapshot.connectionState == ConnectionState.active ||
