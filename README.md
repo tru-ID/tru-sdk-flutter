@@ -26,6 +26,10 @@ When data connectivity is not available and/or an internal SDK error occurred
 {
 "error" : string,
 "error_description": string
+"debug": {
+    "device_info": string,
+    "url_trace" : string
+          }
 }
 ```
 Potential error codes: `sdk_no_data_connectivity`, `sdk_connection_error`, `sdk_redirect_error`, `sdk_error`.
@@ -73,10 +77,12 @@ import 'package:tru_sdk_flutter/tru_sdk_flutter.dart';
       
       if (reach["http_status"] == 200) {
          // device is eligible for tru.ID
+         Map body = reach["response_body"] as Map<dynamic, dynamic>;
+         Coverage cv = Coverage.fromJson(body);
       } else if (reach["status"] == 400) {
          // MNO not supported
       } else if (reach["status"] == 412) {
-         // Not a mobible IP
+         // Not a mobile IP
       } else {
          // No Data Connectivity - Ask the end-user to turn on Mobile Data
       }
@@ -97,11 +103,15 @@ import 'package:tru_sdk_flutter/tru_sdk_flutter.dart';
          // error
       } else if (reach.containsKey("http_status")) {
          if (result["http_status"] == 200) {
-          Map<Object?, Object?> body = result["response_body"] as Map<Object?, Object?>;
+          Map body = result["response_body"] as Map<dynamic, dynamic>;
             if (body["code"] != null) {
+               CheckSuccessBody successBody = CheckSuccessBody.fromJson(body);
                // send code, check_id and reference_id to back-end 
                // to trigger a PATCH /checks/{check_id}
-            }    
+            } else {
+               CheckErrorBody errorBody = CheckErrorBody.fromJson(body);
+               // error
+            }   
          } else if (result["status"] == 400) {
           // MNO not supported
          } else if (result["status"] == 412) {

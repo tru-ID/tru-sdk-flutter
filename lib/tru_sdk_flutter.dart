@@ -21,7 +21,6 @@
  * SOFTWARE.
  */
 import 'dart:async';
-import 'dart:ffi';
 import 'package:flutter/services.dart';
 
 class TruSdkFlutter {
@@ -33,13 +32,105 @@ class TruSdkFlutter {
     return version;
   }
 
-  Future<Map<Object?, Object?>> openWithDataCellular(
-      String url, bool debug) async {
+  Future<Map> openWithDataCellular(String url, bool debug) async {
     try {
       return await _channel
           .invokeMethod('openWithDataCellular', {'url': url, 'debug': debug});
     } on PlatformException catch (e) {
-      return {'error': 'sdk_error', 'error_description': 'Platform exception'};
+      return {'error': 'sdk_error', 'error_description': e.message};
     }
+  }
+}
+
+class Coverage {
+  final String country;
+  final String networkId;
+  final String networkName;
+  final List<Product>? products;
+  Coverage(
+      {required this.country,
+      required this.networkId,
+      required this.networkName,
+      required this.products});
+
+  factory Coverage.fromJson(Map<dynamic, dynamic> json) {
+    List<Product> products = <Product>[];
+    if (json['products'] != null) {
+      json['products'].forEach((item) {
+        products.add(Product.fromJson(item));
+      });
+    }
+    return Coverage(
+        country: json['country_code'],
+        networkId: json['network_id'],
+        networkName: json['network_name'],
+        products: products);
+  }
+}
+
+class Product {
+  final String id;
+  final String name;
+  Product({required this.id, required this.name});
+
+  factory Product.fromJson(Map<dynamic, dynamic> json) {
+    return Product(
+      id: json['product_id'],
+      name: json['product_name'],
+    );
+  }
+
+  @override
+  String toString() {
+    return id + " - " + name;
+  }
+}
+
+class CheckSuccessBody {
+  final String code;
+  final String checkId;
+  final String? referenceId;
+
+  CheckSuccessBody(
+      {required this.code, required this.checkId, required this.referenceId});
+
+  factory CheckSuccessBody.fromJson(Map<dynamic, dynamic> json) {
+    return CheckSuccessBody(
+      code: json['code'],
+      checkId: json['check_id'],
+      referenceId: json['reference_id'],
+    );
+  }
+
+  @override
+  String toString() {
+    return code + " - " + checkId;
+  }
+}
+
+class CheckErrorBody {
+  final String error;
+  final String description;
+  final String checkId;
+  final String? referenceId;
+
+  CheckErrorBody(
+      {required this.error,
+      required this.description,
+      required this.checkId,
+      required this.referenceId});
+
+  factory CheckErrorBody.fromJson(Map<dynamic, dynamic> json) {
+    return CheckErrorBody(
+      error: json['error'],
+      description: json['error_description'],
+      checkId: json['check_id'],
+      referenceId: json['reference_id'],
+    );
+  }
+
+  @override
+  String toString() {
+    return error + " - " + description;
   }
 }
