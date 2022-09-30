@@ -115,7 +115,7 @@ import 'package:tru_sdk_flutter/tru_sdk_flutter.dart';
          } else if (result["status"] == 400) {
           // MNO not supported
          } else if (result["status"] == 412) {
-            // Not a mobible IP
+            // Not a mobile IP
          } else {
             // No Data Connectivity - Ask the end-user to turn on Mobile Data
          }
