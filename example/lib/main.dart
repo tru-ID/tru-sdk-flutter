@@ -243,35 +243,37 @@ class _PhoneCheckAppState extends State<PhoneCheckHome> {
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<CheckStatus> executeFlow(String phoneNumber) async {
     print("[Reachability] - Start");
+    var canMoveToNextStep = false;
     TruSdkFlutter sdk = TruSdkFlutter();
     try {
       Map reach = await sdk.openWithDataCellular(
           "https://eu.api.tru.id/public/coverage/v0.1/device_ip", false);
       print("isReachable = $reach");
-
       if (reach.containsKey("error")) {
         throw Exception(
             'Status = ${reach["error"]} - ${reach["error_description"]}');
-      } else if (reach.containsKey("http_status") &&
-          reach["http_status"] != 200) {
-        print("isReachable non-200 OK");
-        //if status exists, there is an error
-        if (reach["status"] == 400 || reach["status"] == 412) {
-          // We should not be proceeding with the phoneCheck and display an error to the user
-          throw Exception('Either MNO Not Supported or Not a Mobile IP');
-        } else {
-          // No Data Connectivity - Ask the end-user to turn on Mobile Data
-          throw Exception(
-              'Status = ${reach["status"]} - ${reach["response_body"]}');
-        }
-      } else if (reach.containsKey("http_status") ||
-          reach["http_status"] == 200) {
-        Map body = reach["response_body"] as Map<dynamic, dynamic>;
-        Coverage cv = Coverage.fromJson(body);
-        print("body  ${cv.networkName}");
-        if (cv.products != null) print("product  ${cv.products![0]}");
-        //everything is fine
-        print("[PhoneCheck] - Creating phone check");
+      } else if (reach.containsKey("http_status")) {
+          if (reach["http_status"] == 200 && reach["response_body"] != null) {
+            Map body = reach["response_body"] as Map<dynamic, dynamic>;
+            Coverage cv = Coverage.fromJson(body);
+            print("body  ${cv.networkName}");
+            if (cv.products != null) print("product  ${cv.products![0]}");
+            //everything is fine
+            // DO Phonecheck!
+            canMoveToNextStep = true;
+          } else if (reach["http_status"] == 400 && reach["response_body"] != null) {
+            ApiError body = ApiError.fromJson(reach["response_body"]);
+            print("[Is Reachable 400] ${body.detail}");
+          } else if (reach["http_status"] == 412 && reach["response_body"] != null) {
+            ApiError body = ApiError.fromJson(reach["response_body"]);
+            print("[Is Reachable 412] ${body.detail}");
+          } else if (reach["response_body"] != null) {
+            ApiError body = ApiError.fromJson(reach["response_body"]);
+            print("[Is Reachable ] ${body.detail}");
+          }
+      }
+      if (canMoveToNextStep) {
+        print("Moving on with Creating PhoneCheck...");
         final response = await http.post(
           Uri.parse('$baseURL/v0.2/phone-check'),
           headers: <String, String>{
@@ -281,8 +283,8 @@ class _PhoneCheckAppState extends State<PhoneCheckHome> {
             'phone_number': phoneNumber,
           }),
         );
-
         print("[PhoneCheck] - Received response");
+
         if (response.statusCode == 200) {
           PhoneCheck checkDetails =
               PhoneCheck.fromJson(jsonDecode(response.body));
@@ -290,27 +292,30 @@ class _PhoneCheckAppState extends State<PhoneCheckHome> {
           print("openWithDataCellular Results -> $result");
           if (result.containsKey("error")) {
             print(result);
-            throw Exception('result returns error');
-          } else if (result.containsKey("http_status") &&
-              result["http_status"] == 200) {
-            Map body = result["response_body"] as Map<dynamic, dynamic>;
-            if (body["code"] != null) {
-              CheckSuccessBody successBody = CheckSuccessBody.fromJson(body);
-              print('successBody $successBody');
-              try {
-                return exchangeCode(successBody.checkId, successBody.code,
-                    successBody.referenceId);
-              } catch (error) {
-                print(error);
-                throw Exception('result returns error');
+            throw Exception('Error in openWithDataCellular: $result');
+          } else if (result["http_status"] == 200 && result["response_body"] != null)
+          {
+              if (result["response_body"].containsKey("error")) {
+                CheckErrorBody body = CheckErrorBody.fromJson(result["response_body"]);
+                print("CheckErrorBody: ${body.description}");
+                throw Exception('openWithDataCellular error ${body.description}');
+              } else {
+                CheckSuccessBody body = CheckSuccessBody.fromJson(result["response_body"]);
+                 print('CheckSuccessBody $body');
+                 try {
+                   return exchangeCode(body.checkId, body.code, body.referenceId);
+                 } catch (error) {
+                   print("Error retrieving check result $error");
+                   throw Exception("Error retrieving check result");
+                 }
               }
+
             } else {
-              CheckErrorBody errorBody = CheckErrorBody.fromJson(body);
-              print('errorBody $errorBody');
-              throw Exception('openWithDataCellular error $errorBody');
+              ApiError body = ApiError.fromJson(result["response_body"]);
+              print("ApiError ${body.detail}");
+              throw Exception("Error: ${body.detail}");
+
             }
-          } else
-            throw Exception('openWithDataCellular unexpected status');
         } else {
           throw Exception('Failed to create phone check');
         }
@@ -325,23 +330,6 @@ class _PhoneCheckAppState extends State<PhoneCheckHome> {
   }
 }
 
-//v0.1 Only
-Future<CheckStatus> fetchPhoneCheckResult(String checkID) async {
-  print("[CheckStatus] - Fetching phone check status");
-  final response = await http.get(
-    Uri.parse('$baseURL/v0.1/phone-check?check_id=$checkID'),
-  );
-
-  print("[CheckStatus] - Received response");
-  if (response.statusCode == 200) {
-    print('Response: ${response.body}');
-    return CheckStatus.fromJson(jsonDecode(response.body));
-  } else {
-    throw Exception('Failed to fetch phone check status');
-  }
-}
-
-//v0.2 Only
 Future<CheckStatus> exchangeCode(
     String checkID, String code, String? referenceID) async {
   var body = jsonEncode(<String, String>{

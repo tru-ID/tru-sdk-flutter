@@ -134,3 +134,23 @@ class CheckErrorBody {
     return error + " - " + description;
   }
 }
+
+class ApiError {
+  final int status;
+  final String type;
+  final String title;
+  final String detail;
+  ApiError(
+    {required this.status,
+    required this.type,
+    required this.title,
+    required this. detail});
+  factory ApiError.fromJson(Map<dynamic, dynamic> json) {
+    return ApiError(
+      status: json['status'],
+      type: json['type'],
+      title: json['title'],
+      detail: json['detail'],
+    );
+  }
+}
