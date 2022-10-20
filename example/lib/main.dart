@@ -259,7 +259,6 @@ class _PhoneCheckAppState extends State<PhoneCheckHome> {
             print("body  ${cv.networkName}");
             if (cv.products != null) print("product  ${cv.products![0]}");
             //everything is fine
-            // DO Phonecheck!
             canMoveToNextStep = true;
           } else if (reach["http_status"] == 400 && reach["response_body"] != null) {
             ApiError body = ApiError.fromJson(reach["response_body"]);
