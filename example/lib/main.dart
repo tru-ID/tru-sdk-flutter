@@ -254,7 +254,7 @@ class _PhoneCheckAppState extends State<PhoneCheckHome> {
             'Status = ${reach["error"]} - ${reach["error_description"]}');
       } else if (reach.containsKey("http_status")) {
           if (reach["http_status"] == 200 && reach["response_body"] != null) {
-            Map body = reach["response_body"] as Map<dynamic, dynamic>;
+            Map<dynamic, dynamic> body = reach["response_body"];
             Coverage cv = Coverage.fromJson(body);
             print("body  ${cv.networkName}");
             if (cv.products != null) print("product  ${cv.products![0]}");

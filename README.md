@@ -69,22 +69,21 @@ import 'package:tru_sdk_flutter/tru_sdk_flutter.dart';
 // ...
    TruSdkFlutter sdk = TruSdkFlutter();
 
-   Map<Object?, Object?> reach = await sdk.openWithDataCellular(
+   Map reach = await sdk.openWithDataCellular(
       "https://eu.api.tru.id/public/coverage/v0.1/device_ip", false);
    if (reach.containsKey("error")) {
       // Network connectivity error
    } else if (reach.containsKey("http_status")) {
-      
-      if (reach["http_status"] == 200) {
+      if (reach["http_status"] == 200 && reach["response_body"] != null) {
          // device is eligible for tru.ID
-         Map body = reach["response_body"] as Map<dynamic, dynamic>;
+         Map<dynamic, dynamic>body = reach["response_body"];
          Coverage cv = Coverage.fromJson(body);
-      } else if (reach["status"] == 400) {
-         // MNO not supported
-      } else if (reach["status"] == 412) {
-         // Not a mobile IP
-      } else {
-         // No Data Connectivity - Ask the end-user to turn on Mobile Data
+      } else if (reach["status"] == 400 && reach["response_body"] != null) {
+         // MNO not supported see ${body.detail}
+      } else if (reach["status"] == 412 && reach["response_body"] != null) {
+         // Not a mobile IP see ${body.detail}
+      } else if (reach["response_body"] != null) {
+         // other error see ${body.detail}
       }
 
    }
@@ -98,26 +97,20 @@ import 'package:tru_sdk_flutter/tru_sdk_flutter.dart';
 // ...
    TruSdkFlutter sdk = TruSdkFlutter();
 
-   Map<Object?, Object?> result = await sdk.openWithDataCellular(checkUrl, false);
+    Map result = await sdk.openWithDataCellular(checkUrl, false);
       if (result.containsKey("error")) {
          // error
-      } else if (reach.containsKey("http_status")) {
-         if (result["http_status"] == 200) {
-          Map body = result["response_body"] as Map<dynamic, dynamic>;
-            if (body["code"] != null) {
-               CheckSuccessBody successBody = CheckSuccessBody.fromJson(body);
-               // send code, check_id and reference_id to back-end 
-               // to trigger a PATCH /checks/{check_id}
-            } else {
+      } else if (result["http_status"] == 200 && result["response_body"] != null) {
+            if (result["response_body"].containsKey("error")) {
                CheckErrorBody errorBody = CheckErrorBody.fromJson(body);
-               // error
-            }   
-         } else if (result["status"] == 400) {
-          // MNO not supported
-         } else if (result["status"] == 412) {
-            // Not a mobile IP
+             // error see ${body.error_description}
+            } else {
+                CheckSuccessBody successBody = CheckSuccessBody.fromJson(body);
+               // send code, check_id and reference_id to back-end
+               // to trigger a PATCH /checks/{check_id}
+            }
          } else {
-            // No Data Connectivity - Ask the end-user to turn on Mobile Data
+            // other error see ${body.detail}
          }
    }
 
