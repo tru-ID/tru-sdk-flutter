@@ -31,7 +31,7 @@ import 'package:tru_sdk_flutter/tru_sdk_flutter.dart';
 import 'src/http/mock_client.dart';
 
 // Set up a local tunnel base url.
-final String baseURL = "YOUR_LOCAL_TUNNEL_URL";
+final String baseURL = "https://f180-2a00-23c7-8589-8d01-f976-4e8b-705a-89de.ngrok.io";
 
 void main() {
   runApp(PhoneCheckApp());

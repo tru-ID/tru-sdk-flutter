@@ -1,5 +1,10 @@
 # tru_sdk_flutter
 # Change Log
+## Version 1.0.2
+_2022-10-24_
+**Bug Fixes**
+- Embedded example app error handling amended
+
 ## Version 1.0.1
 _2022-09-30_
 **Changes**

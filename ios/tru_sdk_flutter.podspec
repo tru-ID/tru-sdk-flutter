@@ -4,7 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'tru_sdk_flutter'
-  s.version          = '1.0.1'
+  s.version          = '1.0.2'
   s.summary          = 'tru.ID Flutter Plugin.'
   s.description      = <<-DESC
 A new flutter plugin project.
