@@ -1,5 +1,11 @@
 # tru_sdk_flutter
 # Change Log
+## Version 1.0.3
+_2022-11-2_
+**Changes**
+- tru.ID Android SDK version update
+- Android target SDK increased to 31 (Android 12)
+
 ## Version 1.0.2
 _2022-10-24_
 **Bug Fixes**
