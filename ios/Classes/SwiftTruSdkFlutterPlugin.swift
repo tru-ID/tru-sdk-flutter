@@ -37,6 +37,7 @@ public class SwiftTruSdkFlutterPlugin: NSObject, FlutterPlugin {
         switch call.method {
         case "getPlatformVersion" : result("iOS " + UIDevice.current.systemVersion)
         case "openWithDataCellular" : openWithDataCellular(arguments: call.arguments, result: result)
+        case "openWithDataCellularAndAccessToken" : openWithDataCellularAndAccessToken(arguments: call.arguments, result: result)
         default:
             result(FlutterMethodNotImplemented)
         }
@@ -66,6 +67,39 @@ public class SwiftTruSdkFlutterPlugin: NSObject, FlutterPlugin {
             result(resp)
         }
     }
+
+    func openWithDataCellularAndAccessToken(arguments: Any?, result: @escaping FlutterResult) {
+            guard let args = arguments as? Dictionary<String, Any> else {
+                result(FlutterError(code: "iOSError",
+                                    message: "Invalid parameters",
+                                    details: nil))
+                return
+            }
+            guard let urlString = args["url"] as? String, let url = URL(string: urlString) else {
+                result(FlutterError(code: "iOSError",
+                                    message: "No url parameter",
+                                    details: nil))
+                return
+            }
+            guard let debug = args["debug"] as? Bool else {
+                result(FlutterError(code: "iOSError",
+                                    message: "No debug parameter",
+                                    details: nil))
+                return
+            }
+            guard let accessToken = args["accessToken"] as? String else {
+            result(FlutterError(code: "iOSError",
+                                message: "No accessToken parameter",
+                                details: nil))
+            return
+        }
+            let sdk = TruSDK()
+        sdk.openWithDataCellularAndAccessToken(url:  url, accessToken: accessToken, debug: debug) { resp in
+                result(resp)
+            }
+        }
+
+
 
 }
 
