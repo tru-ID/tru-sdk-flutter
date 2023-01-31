@@ -61,20 +61,23 @@ To add the package `tru_sdk_flutter` to your app project:
 
 ## Usage
 
-* Is the [device eligible](https://developer.tru.id/docs/reference/utils#tag/coverage/operation/get-public-coverage-by-device-ip) for tru.ID silent authentication?
+* Is the [device eligible](https://developer.tru.id/docs/reference/utils#tag/coverage/operation/get-coverage-by-device-ip) for tru.ID silent authentication?
 
 ```dart
 import 'package:tru_sdk_flutter/tru_sdk_flutter.dart';
 
 // ...
+// retrieve access token with coverage scope from back-end
+   var token = ...
+// open the device_ip public API endpoint
    TruSdkFlutter sdk = TruSdkFlutter();
-
-   Map reach = await sdk.openWithDataCellular(
-      "https://eu.api.tru.id/public/coverage/v0.1/device_ip", false);
-   if (reach.containsKey("error")) {
+   try {
+     Map reach = await sdk.openWithDataCellularAndAccessToken(
+      "https://eu.api.tru.id/coverage/v0.1/device_ip", token, true);
+     if (reach.containsKey("error")) {
       // Network connectivity error
-   } else if (reach.containsKey("http_status")) {
-      if (reach["http_status"] == 200 && reach["response_body"] != null) {
+     } else if (reach.containsKey("http_status")) {
+       if (reach["http_status"] == 200 && reach["response_body"] != null) {
          // device is eligible for tru.ID
          Map<dynamic, dynamic>body = reach["response_body"];
          Coverage cv = Coverage.fromJson(body);
@@ -85,7 +88,6 @@ import 'package:tru_sdk_flutter/tru_sdk_flutter.dart';
       } else if (reach["response_body"] != null) {
          // other error see ${body.detail}
       }
-
    }
 
 ```

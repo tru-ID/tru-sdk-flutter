@@ -28,14 +28,11 @@ import 'package:http/http.dart' as http;
 import 'package:tru_sdk_flutter/tru_sdk_flutter.dart';
 import 'src/http/mock_client.dart';
 import 'package:crypto/crypto.dart';
-
+import '.env.dart';
 
 // Set up a local tunnel base url.
-final String baseURL = "YOUR_LOCAL_TUNNEL_URL";
+final String baseURL = "https://080a-2a00-23c7-8589-8d01-ed63-2488-2ec5-ed08.ngrok.io";
 
-final String RTA_URL = "RTA_URL";
-
-final String RTA_KEY = "RTA_KEY";
 
 void main() {
   runApp(PhoneCheckApp());
@@ -247,7 +244,6 @@ class _PhoneCheckAppState extends State<PhoneCheckHome> {
   // Get Coverage Access Token
 
  Future<TokenResponse>getCoverageAccessToken() async {
-    var bytes1 = utf8.encode(RTA_KEY);
     var signature = sha256.convert(utf8.encode(RTA_KEY));
   final response = await http.get(
      Uri.parse('$RTA_URL/coverage_access_token'),
@@ -268,8 +264,6 @@ class _PhoneCheckAppState extends State<PhoneCheckHome> {
     var canMoveToNextStep = false;
     var tokenResponse = await getCoverageAccessToken();
     var token = tokenResponse.accessToken;
-    print("token: $token");
-    // var token = 'HvAmGwiyFmNT48GTJYmut_xT5MiwUDNYsJB2_0Tj9AE.8IEr1pp01VexvdvGqSxdlmDiBw4MY9V0wtboxzNr2TM';
     TruSdkFlutter sdk = TruSdkFlutter();
     try {
       Map reach = await sdk.openWithDataCellularAndAccessToken(

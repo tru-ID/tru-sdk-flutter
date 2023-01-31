@@ -111,7 +111,7 @@ class TruSdkFlutterPlugin : FlutterPlugin, MethodCallHandler {
     fun openWithDataCellularAndAccessToken(args: Map<String, Any>, result: Result) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                var accessToken: String?
+                var accessToken: String? = ""
                 var debug: Boolean = false
                 if (!args.containsKey("url")) {
                     val failure =
@@ -120,6 +120,9 @@ class TruSdkFlutterPlugin : FlutterPlugin, MethodCallHandler {
                 }
                 if (args.containsKey("debug")) {
                     debug = args["debug"] as Boolean
+                }
+                if (args.containsKey("accessToken")) {
+                    accessToken = args["accessToken"] as String
                 }
 
                 val body = sdk.openWithDataCellularAndAccessToken(URL(args["url"] as String?), accessToken, debug)
