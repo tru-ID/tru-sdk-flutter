@@ -1,5 +1,10 @@
 # tru_sdk_flutter
 # Change Log
+## Version 1.0.4
+_2023-01-31_
+**Changes**
+- Increased tru.ID Android and iOS SDK versions
+- New method openWithDataCellularAndAccessToken added
 ## Version 1.0.3
 _2022-11-2_
 **Changes**

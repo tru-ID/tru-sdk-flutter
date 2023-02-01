@@ -40,6 +40,15 @@ class TruSdkFlutter {
       return {'error': 'sdk_error', 'error_description': e.message};
     }
   }
+
+  Future<Map> openWithDataCellularAndAccessToken(String url, String? accessToken, bool debug) async {
+    try {
+      return await _channel
+          .invokeMethod('openWithDataCellularAndAccessToken', {'url': url, 'accessToken': accessToken,'debug': debug});
+    } on PlatformException catch (e) {
+      return {'error': 'sdk_error', 'error_description': e.message};
+    }
+  }
 }
 
 class Coverage {
@@ -67,6 +76,8 @@ class Coverage {
         products: products);
   }
 }
+
+
 
 class Product {
   final String id;
