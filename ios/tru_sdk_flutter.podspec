@@ -4,7 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'tru_sdk_flutter'
-  s.version          = '1.0.4'
+  s.version          = '1.0.5'
   s.summary          = 'tru.ID Flutter Plugin.'
   s.description      = <<-DESC
 A new flutter plugin project.
@@ -15,7 +15,7 @@ A new flutter plugin project.
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
-  s.dependency 'tru-sdk-ios', '1.0.2'
+  s.dependency 'tru-sdk-ios', '1.0.3'
   s.platform = :ios, '13.0'
 
   # Flutter.framework does not contain a i386 slice.
