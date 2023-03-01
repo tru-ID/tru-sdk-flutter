@@ -1,5 +1,9 @@
 # tru_sdk_flutter
 # Change Log
+## Version 1.0.5
+_2023-03-01_
+**Changes**
+- Increased tru.ID iOS SDK version
 ## Version 1.0.4
 _2023-01-31_
 **Changes**
