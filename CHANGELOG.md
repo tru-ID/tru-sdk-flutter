@@ -1,5 +1,9 @@
 # tru_sdk_flutter
 # Change Log
+## Version 1.0.7
+_2023-05-04_
+**Changes**
+- Added mobile_data_ip to Coverage
 ## Version 1.0.6
 _2023-04-25_
 **Changes**
