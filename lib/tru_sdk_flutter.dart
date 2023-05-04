@@ -55,11 +55,13 @@ class Coverage {
   final String country;
   final String networkId;
   final String networkName;
+  final String mobileDataIp;
   final List<Product>? products;
   Coverage(
       {required this.country,
       required this.networkId,
       required this.networkName,
+      required this.mobileDataIp,
       required this.products});
 
   factory Coverage.fromJson(Map<dynamic, dynamic> json) {
@@ -73,6 +75,7 @@ class Coverage {
         country: json['country_code'],
         networkId: json['network_id'],
         networkName: json['network_name'],
+        mobileDataIp:json['mobile_data_ip'],
         products: products);
   }
 }
