@@ -1,5 +1,9 @@
 # tru_sdk_flutter
 # Change Log
+## Version 1.0.8
+_2023-06-14_
+**Changes**
+- Example app coverage_access_token to be taken from dev_server
 ## Version 1.0.7
 _2023-05-04_
 **Changes**
