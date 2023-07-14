@@ -27,11 +27,10 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:tru_sdk_flutter/tru_sdk_flutter.dart';
 import 'src/http/mock_client.dart';
-import 'package:crypto/crypto.dart';
 
 
 // Set up a local tunnel base url.
-final String baseURL = "https://d5bd-2a00-23c7-8589-8d01-a86c-2611-e179-f066.ngrok-free.app";
+final String baseURL = "YOUR_LOCAL_TUNNEL_URL";
 
 
 void main() {
