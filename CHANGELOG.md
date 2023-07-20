@@ -1,5 +1,11 @@
 # tru_sdk_flutter
 # Change Log
+## Version 1.0.9
+_2023-07-20_
+**Changes**
+- Bump tru-android-sdk dependency to v1.0.5. 
+- Bump tru-ios-sdk dependency to v1.0.5. 
+- Android target increased to Android 13
 ## Version 1.0.8
 _2023-06-14_
 **Changes**
