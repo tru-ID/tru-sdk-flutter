@@ -1,5 +1,9 @@
 # tru_sdk_flutter
 # Change Log
+## Version 1.0.11
+_2023-08-21_
+**Changes**
+- Bump tru-sdk-ios dependency to v1.0.7.
 ## Version 1.0.10
 _2023-08-14_
 **Changes**
