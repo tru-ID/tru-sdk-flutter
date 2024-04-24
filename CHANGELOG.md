@@ -1,5 +1,9 @@
 # tru_sdk_flutter
 # Change Log
+## Version 1.0.13
+_2023-04-24_
+**Changes**
+- Bump tru-sdk-ios dependency to v1.0.10. (PrivacyInfo added)
 ## Version 1.0.12
 _2023-03-22_
 **Changes**
